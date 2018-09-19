@@ -25,6 +25,15 @@ A sample of the schema is:
       "scheme pattern 1": "a different string to be used by schemes matching 'scheme pattern 1'",
       "scheme pattern 2": "a different string to be used by schemes matching 'scheme pattern 2'"   
     }
+  },
+  "group: {
+    "key": {
+      "type": "String",
+      "defaultValue": "value to be used by all schemes",
+      "overrides": {
+        "scheme pattern 1": "a different string to be used by schemes matching 'scheme pattern 1'",
+        "scheme pattern 2": "a different string to be used by schemes matching 'scheme pattern 2'"   
+      }
   }
 }
 ```
@@ -45,6 +54,8 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Reference`: See "Reference Properties" below.
 
 `overrides` contains values that are different to the provided `defaultValue`. The keys in this dictionary should be a regex pattern to match the scheme passed in. The values should be the same type as the `defaultValue` as specified by `type`. If two overridden values could match, the first suitable value found is used. `overrides` is optional, if not provided, all schemes will use the `defaultValue`.
+
+Note properties can also be grouped together as per the second example. Any number of properties can be added to a named group, which will create a nested class within the parent config class with the properties attached.
 
 #### Associated Properties
 
