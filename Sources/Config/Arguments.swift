@@ -54,3 +54,21 @@ extension Arguments {
         self.additionalExtension = argumentPairs[.additionalExtension]
     }
 }
+
+extension Array where Element == String {
+
+    public func arguments<T>() -> [T: Element] where T: RawRepresentable, T: Hashable, T.RawValue == String {
+        let args = Array(suffix(from: 1))
+        var arguments: [T: Element] = [:]
+
+        stride(from: 0, to: args.count, by: 2).forEach { index in
+            if let key = T(rawValue: args[index]) {
+                if index + 1 < args.count {
+                    let value = args[index + 1]
+                    arguments[key] = value
+                }
+            }
+        }
+        return arguments
+    }
+}
