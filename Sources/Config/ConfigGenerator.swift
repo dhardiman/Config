@@ -39,7 +39,17 @@ public class ConfigGenerator {
             }
             swiftOutput.appendPathExtension("swift")
             let newData = configurationFile.description
-            if let currentData = try? String(contentsOf: swiftOutput), newData == currentData {
+            var shouldWrite = true
+            if let currentData = try? String(contentsOf: swiftOutput) {
+                if newData == currentData {
+                    shouldWrite = false
+                } else {
+                    print("Existing file different from new file, writing \(url.lastPathComponent)")
+                }
+            } else {
+                print("Existing file not present, writing \(url.lastPathComponent)")
+            }
+            if shouldWrite == false {
                 print("Ignoring \(url.lastPathComponent) as it has not changed")
             } else {
                 print("Wrote \(url.lastPathComponent)")
