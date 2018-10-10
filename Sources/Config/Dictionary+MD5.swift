@@ -12,7 +12,13 @@ import CommonCrypto
 extension Dictionary {
 
     func hashRepresentation() throws -> String {
-        let data = try JSONSerialization.data(withJSONObject: self, options: [])
+        let options: JSONSerialization.WritingOptions
+        if #available(OSX 10.13, *) {
+            options = .sortedKeys
+        } else {
+            options = []
+        }
+        let data = try JSONSerialization.data(withJSONObject: self, options: options)
         var digestData = Data(count: Int(CC_MD5_DIGEST_LENGTH))
 
         _ = digestData.withUnsafeMutableBytes { digestBytes in
