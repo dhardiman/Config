@@ -44,7 +44,7 @@ public class ConfigGenerator {
                 if newData == currentData {
                     shouldWrite = false
                 } else {
-                    print("Existing file different from new file, writing \(url.lastPathComponent)")
+                    print("Existing file different from new file, writing \(url.lastPathComponent)\nExisting: \(currentData), New: \(newData)")
                 }
             } else {
                 print("Existing file not present, writing \(url.lastPathComponent)")
