@@ -62,6 +62,7 @@ struct EnumConfiguration: Template {
             let value = configProperty.value(for: self.scheme)
             return "    case \(configProperty.key)" + (value.isEmpty ? "" : " = \"\(value.replacingOccurrences(of: "\\", with: "\\\\"))\"")
         }
+        .sorted()
         .joined(separator: "\n")
         return template.replacingOccurrences(of: "{filename}", with: name)
             .replacingOccurrences(of: "{scheme}", with: scheme)
