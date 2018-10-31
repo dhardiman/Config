@@ -7,10 +7,10 @@ Because each configuration requires a completely separate input file, it doesn't
 ### How to use
 Simply pass a folder and a scheme name to the command:
 ```
-config --configPath /path/to/my/config --scheme my-scheme-name
+generateconfig --configPath /path/to/my/config --scheme my-scheme-name
 ```
 
-`config` will find all files with a `.config` file extension, search for a suitable template, and output a .swift file for each file.
+`generateconfig` will find all files with a `.config` file extension, search for a suitable template, and output a .swift file for each file.
 
 ## Schemas
 ### Default
