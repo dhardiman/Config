@@ -18,6 +18,9 @@ A sample of the schema is:
 
 ```
 {
+  "template": {
+    "imports": [ "MyCustomFramework" ]
+  },
   "key": {
     "type": "String",
     "defaultValue": "value to be used by all schemes",
@@ -52,6 +55,7 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Colour`: A colour in hex format, will be output as a `UIColor`.
 - `Reference`: See [Reference Properties](#reference-properties) below.
+- Enum types. Set the `type` to the name of the enum, set the value to be the case, preceded by a `.`, so `.thing`. If you need enums from a custom module, add a string array of imports to the template section.
 
 `overrides` contains values that are different to the provided `defaultValue`. The keys in this dictionary should be a regex pattern to match the scheme passed in. The values should be the same type as the `defaultValue` as specified by `type`. If two overridden values could match, the first suitable value found is used. `overrides` is optional, if not provided, all schemes will use the `defaultValue`.
 

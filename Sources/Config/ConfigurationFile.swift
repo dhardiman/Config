@@ -11,8 +11,7 @@ import Foundation
 private let outputTemplate = """
 /* {filename} auto-generated from {scheme} */
 
-import Foundation
-import UIKit
+import Foundation{imports}
 
 // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
 public {entityType} {name} {
@@ -160,11 +159,15 @@ struct ConfigurationFile: Template {
 
     let template: [String: Any]?
 
+    let imports: [String]
+
     init(config: [String: Any], name: String, scheme: String, source: URL) throws {
         self.scheme = scheme
         self.name = name
 
         self.template = config["template"] as? [String: Any]
+
+        self.imports = (self.template?["imports"] as? [String]) ?? []
 
         var referenceSource: [String: Any]?
         if let referenceSourceFileName = template?["referenceSource"] as? String {
@@ -207,9 +210,12 @@ struct ConfigurationFile: Template {
         let extendedClass = template?["extensionOn"] as? String
 
         let entityType = extendedClass != nil ? "extension" : "class"
+        let additionalImports = imports.map { "import \($0)" }.joined(separator: "\n")
+        let importsString = additionalImports.isEmpty ? "" : "\n" + additionalImports
 
         return outputTemplate
             .replacingOccurrences(of: "{filename}", with: "\(name).swift")
+            .replacingOccurrences(of: "{imports}", with: importsString)
             .replacingOccurrences(of: "{entityType}", with: entityType)
             .replacingOccurrences(of: "{name}", with: extendedClass ?? name)
             .replacingOccurrences(of: "{scheme}", with: scheme)
