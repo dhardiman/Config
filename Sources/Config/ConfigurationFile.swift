@@ -65,7 +65,7 @@ struct Configuration {
             let firstLetter = className[startIndex]
             className = className.replacingCharacters(in: startIndex...startIndex, with: firstLetter.description.uppercased())
             return """
-            \(String.indent(for: indentWidth))public class \(className) {
+            \(String.indent(for: indentWidth))public enum \(className) {
             \(config.value.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, indentWidth: indentWidth + 1))
             \(String.indent(for: indentWidth))}
             """
@@ -209,7 +209,7 @@ struct ConfigurationFile: Template {
 
         let extendedClass = template?["extensionOn"] as? String
 
-        let entityType = extendedClass != nil ? "extension" : "class"
+        let entityType = extendedClass != nil ? "extension" : "enum"
         let additionalImports = imports.map { "import \($0)" }.joined(separator: "\n")
         let importsString = additionalImports.isEmpty ? "" : "\n" + additionalImports
 
