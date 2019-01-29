@@ -17,6 +17,7 @@ import Foundation{imports}
 public {entityType} {name} {
 {contents}
 }
+
 // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
 
 """
