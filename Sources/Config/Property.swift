@@ -63,6 +63,7 @@ enum PropertyType: String {
     case encryptionKey = "EncryptionKey"
     case int = "Int"
     case double = "Double"
+    case float = "Float"
     case dictionary = "Dictionary"
     case bool = "Bool"
     case stringArray = "[String]"
