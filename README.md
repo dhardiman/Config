@@ -22,6 +22,7 @@ A sample of the schema is:
     "imports": [ "MyCustomFramework" ]
   },
   "key": {
+    "description": "An optional comment to document the property. Will be added as a comment to the generated code",
     "type": "String",
     "defaultValue": "value to be used by all schemes",
     "overrides": {

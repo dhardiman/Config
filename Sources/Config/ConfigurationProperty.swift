@@ -11,6 +11,7 @@ import Foundation
 struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
 
     let key: String
+    let description: String?
     let type: PropertyType?
     let typeHint: String
     let defaultValue: T
@@ -39,6 +40,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         } else {
             self.overrides = [:]
         }
+        self.description = dict["description"] as? String
     }
 
     func value(for scheme: String) -> T {
@@ -54,15 +56,18 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
     }
 
     func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, indentWidth: Int) -> String {
-        let template: String
+        var template: String = ""
+        if let description = description {
+            template += "\(String.indent(for: indentWidth))/// \(description)\n"
+        }
         if requiresNonObjCDeclarations {
-            template = """
+            template += """
             \(String.indent(for: indentWidth))@nonobjc public static var {key}: {typeName} {
             \(String.indent(for: indentWidth + 1))return {value}
             \(String.indent(for: indentWidth))}
             """
         } else {
-            template = "\(String.indent(for: indentWidth))public static let {key}: {typeName} = {value}"
+            template += "\(String.indent(for: indentWidth))public static let {key}: {typeName} = {value}"
         }
         let propertyValue = value(for: scheme)
         let outputValue: String
