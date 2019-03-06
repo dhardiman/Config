@@ -207,7 +207,7 @@ struct ConfigurationFile: Template {
     var description: String {
         let extendedClass = template?["extensionOn"] as? String
         let requiresNonObjcDeclarations = template?["requiresNonObjC"] as? Bool ?? false
-        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass != nil)
+        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil)
 
         let entityType = extendedClass != nil ? "extension" : "enum"
         let additionalImports = imports.map { "import \($0)" }.joined(separator: "\n")
