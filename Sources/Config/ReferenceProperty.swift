@@ -37,10 +37,10 @@ struct ReferenceProperty: Property {
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
         if requiresNonObjCDeclarations {
             return """
-            \(String.indent(for: indentWidth))@nonobjc public static var \(key): \(typeName) {
+            \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") static var \(key): \(typeName) {
             \(String.indent(for: indentWidth + 1))return \(value(for: scheme))
             \(String.indent(for: indentWidth))}
             """

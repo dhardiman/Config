@@ -16,12 +16,12 @@ protocol Property {
     var key: String { get }
     var typeName: String { get }
     var associatedProperty: String? { get }
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, indentWidth: Int) -> String
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String
 }
 
 extension Property {
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, indentWidth: Int) -> String {
-        return propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: false, indentWidth: indentWidth)
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, isPublic: Bool, indentWidth: Int) -> String {
+        return propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: false, isPublic: isPublic, indentWidth: indentWidth)
     }
 }
 

@@ -55,19 +55,19 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
         }
         if requiresNonObjCDeclarations {
             template += """
-            \(String.indent(for: indentWidth))@nonobjc public static var {key}: {typeName} {
+            \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") static var {key}: {typeName} {
             \(String.indent(for: indentWidth + 1))return {value}
             \(String.indent(for: indentWidth))}
             """
         } else {
-            template += "\(String.indent(for: indentWidth))public static let {key}: {typeName} = {value}"
+            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
         }
         let propertyValue = value(for: scheme)
         let outputValue: String
