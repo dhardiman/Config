@@ -19,14 +19,12 @@ extension Dictionary {
             options = []
         }
         let data = try JSONSerialization.data(withJSONObject: self, options: options)
-        var digestData = Data(count: Int(CC_MD5_DIGEST_LENGTH))
-
-        _ = digestData.withUnsafeMutableBytes { digestBytes in
-            data.withUnsafeBytes { messageBytes in
-                CC_MD5(messageBytes, CC_LONG(data.count), digestBytes)
-            }
+        var digestData = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
+        data.withUnsafeBytes { messageBytes in
+            _ = CC_MD5(messageBytes.baseAddress!, CC_LONG(data.count), &digestData)
         }
+        let resultData = Data(digestData)
 
-        return digestData.map { String(format: "%02hhx", $0) }.joined()
+        return resultData.map { String(format: "%02hhx", $0) }.joined()
     }
 }
