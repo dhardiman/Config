@@ -69,6 +69,7 @@ enum PropertyType: String {
     case stringArray = "[String]"
     case colour = "Colour"
     case reference = "Reference"
+    case image = "Image"
 
     var typeName: String {
         switch self {
@@ -101,6 +102,8 @@ enum PropertyType: String {
             return dictionaryValue((value as? [String: Any]) ?? [:])
         case .colour:
             return colourValue(for: value as? String)
+        case .image:
+            return "UIImage(named: \"\(value)\")!"
         default:
             return "\(value)"
         }

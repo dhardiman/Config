@@ -98,7 +98,7 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
     var copy = properties
     if let typeHint = PropertyType(rawValue: typeHintValue) {
         switch typeHint {
-        case .string, .url, .encrypted, .encryptionKey, .colour:
+        case .string, .url, .encrypted, .encryptionKey, .colour, .image:
             copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict)
         case .double, .float:
             copy[pair.key] = ConfigurationProperty<Double>(key: pair.key, typeHint: typeHintValue, dict: dict)

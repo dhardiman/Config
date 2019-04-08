@@ -55,6 +55,7 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Bool`: A boolean value
 - `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Colour`: A colour in hex format, will be output as a `UIColor`.
+- `Image`: The name of an image. Will be converted to `UIImage(named: "the value")!`.
 - `Reference`: See [Reference Properties](#reference-properties) below.
 - Enum types. Set the `type` to the name of the enum, set the value to be the case, preceded by a `.`, so `.thing`. If you need enums from a custom module, add a string array of imports to the template section.
 
