@@ -162,6 +162,8 @@ struct ConfigurationFile: Template {
 
     let imports: [String]
 
+    let customTypes: [CustomType]
+
     init(config: [String: Any], name: String, scheme: String, source: URL) throws {
         self.scheme = scheme
         self.name = name
@@ -169,6 +171,8 @@ struct ConfigurationFile: Template {
         self.template = config["template"] as? [String: Any]
 
         self.imports = (self.template?["imports"] as? [String]) ?? []
+
+        self.customTypes = CustomType.typeArray(from: self.template)
 
         var referenceSource: [String: Any]?
         if let referenceSourceFileName = template?["referenceSource"] as? String {
