@@ -56,12 +56,7 @@ struct CustomProperty: Property {
     }
 
     func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
-        var template: String = ""
-        if let description = description {
-            template += "\(String.indent(for: indentWidth))/// \(description)\n"
-        }
-        template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
-        return template.replacingOccurrences(of: "{key}", with: key)
+        return template(for: description, isPublic: isPublic, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
             .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
     }
@@ -73,6 +68,72 @@ struct CustomProperty: Property {
         } else {
             value = defaultValue
         }
+        let template = CustomPropertyValue(value: value)
+        return template.outputValue(for: scheme, type: type)
+    }
+}
+
+struct CustomPropertyArray: Property {
+    let associatedProperty: String? = nil
+
+    let key: String
+    let description: String?
+    let customType: CustomType
+    let defaultValue: [Any]
+    let overrides: [String: [Any]]
+
+    init(key: String, customType: CustomType, dict: [String: Any]) {
+        self.key = key
+        self.customType = customType
+        self.description = dict["description"] as?  String
+        self.defaultValue = dict["defaultValue"]! as! [Any]
+        self.overrides =  (dict["overrides"] as? [String: [Any]]) ?? [:]
+    }
+
+    var typeName: String {
+        return "[\(customType.typeName)]"
+    }
+
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+        return template(for: description, isPublic: isPublic, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
+            .replacingOccurrences(of: "{typeName}", with: typeName)
+            .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
+    }
+
+    private func outputValue(for scheme: String, type: CustomType) -> String {
+        let value: [Any]
+        if let override = overrides[scheme] {
+            value = override
+        } else {
+            value = defaultValue
+        }
+        return "[" + value.map { CustomPropertyValue(value: $0).outputValue(for: scheme, type: type) }
+            .joined(separator: ", ") + "]"
+    }
+}
+
+private func valueString(from value: Any?) -> String {
+    guard let value = value else { return "" }
+    if value is String {
+        return "\"\(value)\""
+    } else {
+        return "\(value)"
+    }
+}
+
+private func template(for description: String?, isPublic: Bool, indentWidth: Int) -> String {
+    var template: String = ""
+    if let description = description {
+        template += "\(String.indent(for: indentWidth))/// \(description)\n"
+    }
+    template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
+    return template
+}
+
+private struct CustomPropertyValue {
+    let value: Any
+
+    func outputValue(for scheme: String, type: CustomType) -> String {
         switch type.placeholders.count {
         case 0:
             return type.initialiser
@@ -81,16 +142,8 @@ struct CustomProperty: Property {
         default:
             let dictionaryValue = value as! [String: Any]
             return type.placeholders.reduce(type.initialiser) { template, placeholder in
-                template.replacingOccurrences(of: "{placeholder}", with: valueString(from: dictionaryValue[placeholder] ?? defaultValue))
+                template.replacingOccurrences(of: "{placeholder}", with: valueString(from: dictionaryValue[placeholder]))
             }
-        }
-    }
-
-    private func valueString(from value: Any) -> String {
-        if value is String {
-            return "\"\(value)\""
-        } else {
-            return "\(value)"
         }
     }
 }

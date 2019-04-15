@@ -117,17 +117,16 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
             copy[pair.key] = ReferenceProperty(key: pair.key, dict: dict, typeName: referenceType.typeName)
         }
     } else {
-        if let customType =  customTypes.first(where: { $0.typeName == typeHintValue }) {
-            copy[pair.key] = customProperty(for: customType, key: pair.key, dict: dict)
-        } else {
+        if let customType = customTypes.first(where: { $0.typeName == typeHintValue }) {
+            copy[pair.key] = CustomProperty(key: pair.key, customType: customType, dict: dict)
+        } else if let customType = customTypes.first(where: { typeHintValue.range(of: "[\($0.typeName)]", options: .regularExpression) != nil }) {
+            copy[pair.key] = CustomPropertyArray(key: pair.key, customType: customType, dict: dict)
+        }
+        else {
             copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict)
         }
     }
     return copy
-}
-
-private func customProperty(for customType: CustomType, key: String, dict: [String: Any]) -> Property {
-    return CustomProperty(key: key, customType: customType, dict: dict)
 }
 
 private func referenceTypeHint(for dict: [String: Any], in config: [String: Any], referenceSource: [String: Any]?) -> PropertyType? {
