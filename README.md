@@ -144,7 +144,7 @@ A sample of the schema is:
 
 ### Extensions
 This schema should be used for creating extensions on existing classes.
-A Sample of the scehma is:
+A Sample of the schema is:
 
 ```
 {
@@ -164,6 +164,37 @@ A Sample of the scehma is:
 ```
 
 This will output an extension on `UIColor` in a file called `UIColor+Palette.swift`.
+
+### Custom types
+It is possible to use your own custom types with config. Add a `customTypes` array to your `template` section and you can then add your values, either as a string, for single values, or as a keyed dictionary. For example:
+
+```
+{
+  "template": {
+    "customTypes": [
+      {
+        "typeName": "MyCustomType",
+        "initialiser": "MyCustomType(thing: {$0})"
+      },
+      {
+        "typeName": "MyMoreComplexCustomType",
+        "initialiser": "MyMoreComplexCustomType(thing: {thing}, otherThing: {otherThing})"
+      }
+    ]
+  },
+  "myThing": {
+    "type": "MyCustomType",
+    "defaultValue": "Thingy"
+  },
+  "myOtherThing": {
+    "type": "MyMoreComplexCustomType",
+    "defaultValue": {
+      "thing": "Thingy",
+      "otherThing": "A different thingy"
+    }
+  }
+}
+```
 
 ## Writing your own schemas
 Just add a new class or struct to the project and implement `Template`. Add your new parser to the `templates` array in main.swift. Your template should inspect a `template` dictionary in any config and decide whether it can parse it. Either using a `name` item, or through other means. Ensure `ConfigurationFile` is the last item in that array. As the default schema parser it claims to be able to parse all files.
