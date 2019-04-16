@@ -79,6 +79,8 @@ enum PropertyType: String {
             return "[String: Any]"
         case .colour:
             return "UIColor"
+        case .image:
+            return "UIImage"
         default:
             return rawValue
         }
@@ -104,6 +106,8 @@ enum PropertyType: String {
             return colourValue(for: value as? String)
         case .image:
             return "UIImage(named: \"\(value)\")!"
+        case .bool:
+            return "\(value as! Bool)"
         default:
             return "\(value)"
         }
