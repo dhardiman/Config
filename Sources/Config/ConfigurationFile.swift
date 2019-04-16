@@ -119,7 +119,7 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
     } else {
         if let customType = customTypes.first(where: { $0.typeName == typeHintValue }) {
             copy[pair.key] = CustomProperty(key: pair.key, customType: customType, dict: dict)
-        } else if let customType = customTypes.first(where: { typeHintValue.range(of: "[\($0.typeName)]", options: .regularExpression) != nil }) {
+        } else if let customType = customTypes.first(where: { typeHintValue.range(of: "\\[\($0.typeName)\\]", options: .regularExpression) != nil }) {
             copy[pair.key] = CustomPropertyArray(key: pair.key, customType: customType, dict: dict)
         }
         else {

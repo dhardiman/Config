@@ -28,7 +28,7 @@ struct CustomType {
     }
 
     var placeholders: [String] {
-        let placeholderRegex = try! NSRegularExpression(pattern: "{(.*?)}", options: [])
+        let placeholderRegex = try! NSRegularExpression(pattern: "\\{(.*?)\\}", options: [])
         let matches = placeholderRegex.matches(in: initialiser, options: [], range: NSRange(location: 0, length: initialiser.count))
         return matches.map { (initialiser as NSString).substring(with: $0.range(at: 1)) }
     }
@@ -102,8 +102,8 @@ struct CustomPropertyArray: Property {
 
     private func outputValue(for scheme: String, type: CustomType) -> String {
         let value: [Any]
-        if let override = overrides[scheme] {
-            value = override
+        if let override = overrides.first(where: { $0.key.range(of: scheme, options: .regularExpression) != nil }) {
+            value = override.value
         } else {
             value = defaultValue
         }
@@ -114,11 +114,7 @@ struct CustomPropertyArray: Property {
 
 private func valueString(from value: Any?) -> String {
     guard let value = value else { return "" }
-    if value is String {
-        return "\"\(value)\""
-    } else {
-        return "\(value)"
-    }
+    return "\(value)"
 }
 
 private func template(for description: String?, isPublic: Bool, indentWidth: Int) -> String {
@@ -142,7 +138,7 @@ private struct CustomPropertyValue {
         default:
             let dictionaryValue = value as! [String: Any]
             return type.placeholders.reduce(type.initialiser) { template, placeholder in
-                template.replacingOccurrences(of: "{placeholder}", with: valueString(from: dictionaryValue[placeholder]))
+                template.replacingOccurrences(of: "{\(placeholder)}", with: valueString(from: dictionaryValue[placeholder]))
             }
         }
     }
