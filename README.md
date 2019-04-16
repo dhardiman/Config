@@ -48,14 +48,14 @@ The "key" will be used as a static property name in a `class` so should have a f
 
 - `String`: A swift string value
 - `URL`: A url. Will be converted to `URL(string: "the value")!`
-- `EncryptionKey`: A key to use to encrypt sensitive info.
-- `Encrypted`: A value that should be encrypted using the provided key
 - `Int`: An integer value.
 - `Double`: A double value
 - `Bool`: A boolean value
-- `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Colour`: A colour in hex format, will be output as a `UIColor`.
 - `Image`: The name of an image. Will be converted to `UIImage(named: "the value")!`.
+- `EncryptionKey`: A key to use to encrypt sensitive info.
+- `Encrypted`: A value that should be encrypted using the provided key
+- `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Reference`: See [Reference Properties](#reference-properties) below.
 - Enum types. Set the `type` to the name of the enum, set the value to be the case, preceded by a `.`, so `.thing`. If you need enums from a custom module, add a string array of imports to the template section.
 
@@ -178,7 +178,7 @@ It is possible to use your own custom types with config. Add a `customTypes` arr
       },
       {
         "typeName": "MyMoreComplexCustomType",
-        "initialiser": "MyMoreComplexCustomType(thing: {thing}, otherThing: {otherThing})"
+        "initialiser": "MyMoreComplexCustomType(thing: {thing}, otherThing: {otherThing:String})"
       }
     ]
   },
@@ -190,13 +190,13 @@ It is possible to use your own custom types with config. Add a `customTypes` arr
     "type": "MyMoreComplexCustomType",
     "defaultValue": {
       "thing": "Thingy",
-      "otherThing": "\"A different thingy\""
+      "otherThing": "A different thingy"
     }
   }
 }
 ```
 
-Note: for string literals, you will ensure your string is appropriately quoted. Whilst a little clunky, this is the only way I can think of for values to contain expressions without creating a more complex schema, either in the custom type template or in the values that use the custom type.
+Placeholders in the initialiser template should be written as `{key}` or `{key:TypeHint}` where the type hint is one of the basic primitive types, `Bool`, `String`, `URL`, `Int`, `Double`. If no type hint is supplied then the value is treated as an expression.
 
 ## Writing your own schemas
 Just add a new class or struct to the project and implement `Template`. Add your new parser to the `templates` array in main.swift. Your template should inspect a `template` dictionary in any config and decide whether it can parse it. Either using a `name` item, or through other means. Ensure `ConfigurationFile` is the last item in that array. As the default schema parser it claims to be able to parse all files.

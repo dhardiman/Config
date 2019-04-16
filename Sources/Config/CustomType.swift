@@ -27,10 +27,10 @@ struct CustomType {
         return types.compactMap { CustomType(source: $0) }
     }
 
-    var placeholders: [String] {
+    var placeholders: [Placeholder] {
         let placeholderRegex = try! NSRegularExpression(pattern: "\\{(.*?)\\}", options: [])
         let matches = placeholderRegex.matches(in: initialiser, options: [], range: NSRange(location: 0, length: initialiser.count))
-        return matches.map { (initialiser as NSString).substring(with: $0.range(at: 1)) }
+        return matches.map { Placeholder(placeholder: (initialiser as NSString).substring(with: $0.range(at: 1))) }
     }
 }
 
@@ -102,7 +102,7 @@ struct CustomPropertyArray: Property {
 
     private func outputValue(for scheme: String, type: CustomType) -> String {
         let value: [Any]
-        if let override = overrides.first(where: { $0.key.range(of: scheme, options: .regularExpression) != nil }) {
+        if let override = overrides.first(where: { scheme.range(of: $0.key, options: .regularExpression) != nil }) {
             value = override.value
         } else {
             value = defaultValue
@@ -115,6 +115,15 @@ struct CustomPropertyArray: Property {
 private func valueString(from value: Any?) -> String {
     guard let value = value else { return "" }
     return "\(value)"
+}
+
+private func valueString(for placeholder: Placeholder, from dictionary: [String: Any]) -> String {
+    guard let value = dictionary[placeholder.name], let unusedIV = try? IV(dict: dictionary) else { return "" }
+    if let type = placeholder.type {
+        return type.valueDeclaration(for: value, iv: unusedIV, key: nil)
+    } else {
+        return "\(value)"
+    }
 }
 
 private func template(for description: String?, isPublic: Bool, indentWidth: Int) -> String {
@@ -138,8 +147,33 @@ private struct CustomPropertyValue {
         default:
             let dictionaryValue = value as! [String: Any]
             return type.placeholders.reduce(type.initialiser) { template, placeholder in
-                template.replacingOccurrences(of: "{\(placeholder)}", with: valueString(from: dictionaryValue[placeholder]))
+                template.replacingOccurrences(of: "\(placeholder)", with: valueString(for: placeholder, from: dictionaryValue))
             }
         }
+    }
+}
+
+struct Placeholder: CustomStringConvertible {
+    let name: String
+    let type: PropertyType?
+
+    init(placeholder: String) {
+        let split = placeholder.split(separator: ":")
+        name = String(split[0])
+        if split.count == 2 {
+            type = PropertyType(rawValue: String(split[1]))
+        } else {
+            type = nil
+        }
+    }
+
+    var description: String {
+        let typeAnnotation: String
+        if let type = type {
+            typeAnnotation = ":\(type.rawValue)"
+        } else {
+            typeAnnotation = ""
+        }
+        return "{\(name)\(typeAnnotation)}"
     }
 }
