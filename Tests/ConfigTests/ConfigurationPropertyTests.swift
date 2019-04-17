@@ -21,9 +21,9 @@ class ConfigurationPropertyTests: XCTestCase {
         ])
     }
 
-    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", isPublic: Bool = false, requiresNonObjC: Bool = false) throws -> String? {
+    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
         let iv = try IV(dict: [:])
-        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: nil, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: 0)
+        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: nil, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -37,6 +37,13 @@ class ConfigurationPropertyTests: XCTestCase {
         let stringProperty = givenAStringProperty()
         let expectedValue = #"    public static let test: String = "test value""#
         let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, isPublic: true)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCaIndentADeclaration() throws {
+        let stringProperty = givenAStringProperty()
+        let expectedValue = #"                static let test: String = "test value""#
+        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, indentWidth: 3)
         expect(actualValue).to(equal(expectedValue))
     }
 
