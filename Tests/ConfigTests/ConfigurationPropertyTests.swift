@@ -21,9 +21,10 @@ class ConfigurationPropertyTests: XCTestCase {
         ])
     }
 
-    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
-        let iv = try IV(dict: [:])
-        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: nil, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
+    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
+        let iv = try IV(dict: ["initialise": "me"])
+        print("\(iv.hash)")
+        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -154,9 +155,28 @@ class ConfigurationPropertyTests: XCTestCase {
     func testItCanWriteAnImageProperty() throws {
         let imageProperty = ConfigurationProperty<String>(key: "test", typeHint: "Image", dict: [
             "defaultValue": "image-name",
-            ])
+        ])
         let expectedValue = #"    static let test: UIImage = UIImage(named: "image-name")!"#
         let actualValue = try whenTheDeclarationIsWritten(for: imageProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnEncryptedValue() throws {
+        // Note: this test doesn't test the encryption itself, that test will be written elsewhere
+        let secretProperty = ConfigurationProperty<String>(key: "test", typeHint: "Encrypted", dict: [
+            "defaultValue": "top-secret",
+        ])
+        let expectedValue = "    static let test: [UInt8] = ["
+        let actualValue = try whenTheDeclarationIsWritten(for: secretProperty, encryptionKey: "the-key")
+        expect(actualValue).to(beginWith(expectedValue))
+    }
+
+    func testItCanWriteAnEncryptionKey() throws {
+        let secretProperty = ConfigurationProperty<String>(key: "test", typeHint: "EncryptionKey", dict: [
+            "defaultValue": "top-secret",
+        ])
+        let expectedValue = "    static let test: [UInt8] = [UInt8(116), UInt8(111), UInt8(112), UInt8(45), UInt8(115), UInt8(101), UInt8(99), UInt8(114), UInt8(101), UInt8(116)]"
+        let actualValue = try whenTheDeclarationIsWritten(for: secretProperty)
         expect(actualValue).to(equal(expectedValue))
     }
 }
