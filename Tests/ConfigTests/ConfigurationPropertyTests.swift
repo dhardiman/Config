@@ -77,4 +77,13 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: stringProperty)
         expect(actualValue).to(equal(expectedValue))
     }
+
+    func testItCanWriteAURLProperty() throws {
+        let urlProperty = ConfigurationProperty<String>(key: "test", typeHint: "URL", dict: [
+            "defaultValue": "https://www.google.com",
+        ])
+        let expectedValue = #"    static let test: URL = URL(string: "https://www.google.com")!"#
+        let actualValue = try whenTheDeclarationIsWritten(for: urlProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
 }
