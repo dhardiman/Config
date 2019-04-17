@@ -48,14 +48,14 @@ The "key" will be used as a static property name in a `class` so should have a f
 
 - `String`: A swift string value
 - `URL`: A url. Will be converted to `URL(string: "the value")!`
-- `EncryptionKey`: A key to use to encrypt sensitive info.
-- `Encrypted`: A value that should be encrypted using the provided key
 - `Int`: An integer value.
 - `Double`: A double value
 - `Bool`: A boolean value
-- `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Colour`: A colour in hex format, will be output as a `UIColor`.
 - `Image`: The name of an image. Will be converted to `UIImage(named: "the value")!`.
+- `EncryptionKey`: A key to use to encrypt sensitive info.
+- `Encrypted`: A value that should be encrypted using the provided key
+- `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Reference`: See [Reference Properties](#reference-properties) below.
 - Enum types. Set the `type` to the name of the enum, set the value to be the case, preceded by a `.`, so `.thing`. If you need enums from a custom module, add a string array of imports to the template section.
 
@@ -144,7 +144,7 @@ A sample of the schema is:
 
 ### Extensions
 This schema should be used for creating extensions on existing classes.
-A Sample of the scehma is:
+A Sample of the schema is:
 
 ```
 {
@@ -164,6 +164,39 @@ A Sample of the scehma is:
 ```
 
 This will output an extension on `UIColor` in a file called `UIColor+Palette.swift`.
+
+### Custom types
+It is possible to use your own custom types with config. Add a `customTypes` array to your `template` section and you can then add your values, either as a string, for single values, or as a keyed dictionary. For example:
+
+```
+{
+  "template": {
+    "customTypes": [
+      {
+        "typeName": "MyCustomType",
+        "initialiser": "MyCustomType(thing: {$0})"
+      },
+      {
+        "typeName": "MyMoreComplexCustomType",
+        "initialiser": "MyMoreComplexCustomType(thing: {thing}, otherThing: {otherThing:String})"
+      }
+    ]
+  },
+  "myThing": {
+    "type": "MyCustomType",
+    "defaultValue": "Thingy"
+  },
+  "myOtherThing": {
+    "type": "MyMoreComplexCustomType",
+    "defaultValue": {
+      "thing": "Thingy",
+      "otherThing": "A different thingy"
+    }
+  }
+}
+```
+
+Placeholders in the initialiser template should be written as `{key}` or `{key:TypeHint}` where the type hint is one of the basic primitive types, `Bool`, `String`, `URL`, `Int`, `Double`. If no type hint is supplied then the value is treated as an expression.
 
 ## Writing your own schemas
 Just add a new class or struct to the project and implement `Template`. Add your new parser to the `templates` array in main.swift. Your template should inspect a `template` dictionary in any config and decide whether it can parse it. Either using a `name` item, or through other means. Ensure `ConfigurationFile` is the last item in that array. As the default schema parser it claims to be able to parse all files.

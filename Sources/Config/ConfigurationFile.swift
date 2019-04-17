@@ -26,12 +26,12 @@ struct Configuration {
     let properties: [String: Property]
     let childConfigurations: [String: Configuration]
 
-    init(config: [String: Any], referenceSource: [String: Any]?) {
+    init(config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType]) {
         properties = config.reduce([String: Property]()) { properties, pair in
-            return parseNextProperty(properties: properties, pair: pair, config: config, referenceSource: referenceSource)
+            return parseNextProperty(properties: properties, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes)
         }
         childConfigurations = config.reduce([String: Configuration]()) { configurations, pair in
-            return parseNextConfiguration(configurations: configurations, pair: pair, config: config, referenceSource: referenceSource)
+            return parseNextConfiguration(configurations: configurations, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes)
         }
     }
 
@@ -90,7 +90,7 @@ extension String {
     }
 }
 
-func parseNextProperty(properties: [String: Property], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?) -> [String: Property] {
+func parseNextProperty(properties: [String: Property], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType]) -> [String: Property] {
     guard let dict = pair.value as? [String: Any],
         let typeHintValue = dict["type"] as? String else {
             return properties
@@ -117,7 +117,14 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
             copy[pair.key] = ReferenceProperty(key: pair.key, dict: dict, typeName: referenceType.typeName)
         }
     } else {
-        copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict)
+        if let customType = customTypes.first(where: { $0.typeName == typeHintValue }) {
+            copy[pair.key] = CustomProperty(key: pair.key, customType: customType, dict: dict)
+        } else if let customType = customTypes.first(where: { typeHintValue.range(of: "\\[\($0.typeName)\\]", options: .regularExpression) != nil }) {
+            copy[pair.key] = CustomPropertyArray(key: pair.key, customType: customType, dict: dict)
+        }
+        else {
+            copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict)
+        }
     }
     return copy
 }
@@ -140,12 +147,12 @@ private func referenceDict(for key: String, from config: [String: Any], or refer
     return referenceSource?[key] as? [String: Any]
 }
 
-func parseNextConfiguration(configurations: [String: Configuration], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?) -> [String: Configuration] {
+func parseNextConfiguration(configurations: [String: Configuration], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType]) -> [String: Configuration] {
     guard let dict = pair.value as? [String: Any], dict["type"] == nil, pair.key != "template" else {
         return configurations
     }
     var copy = configurations
-    copy[pair.key] = Configuration(config: dict, referenceSource: referenceSource)
+    copy[pair.key] = Configuration(config: dict, referenceSource: referenceSource, customTypes: customTypes)
     return copy
 }
 
@@ -162,6 +169,8 @@ struct ConfigurationFile: Template {
 
     let imports: [String]
 
+    let customTypes: [CustomType]
+
     init(config: [String: Any], name: String, scheme: String, source: URL) throws {
         self.scheme = scheme
         self.name = name
@@ -169,6 +178,8 @@ struct ConfigurationFile: Template {
         self.template = config["template"] as? [String: Any]
 
         self.imports = (self.template?["imports"] as? [String]) ?? []
+
+        self.customTypes = CustomType.typeArray(from: self.template)
 
         var referenceSource: [String: Any]?
         if let referenceSourceFileName = template?["referenceSource"] as? String {
@@ -178,7 +189,7 @@ struct ConfigurationFile: Template {
 
         iv = try IV(dict: config)
 
-        let root = Configuration(config: config, referenceSource: referenceSource)
+        let root = Configuration(config: config, referenceSource: referenceSource, customTypes: customTypes)
         var parsedProperties = root.properties
 
         encryptionKey = parsedProperties.values.compactMap { $0 as? ConfigurationProperty<String> }
