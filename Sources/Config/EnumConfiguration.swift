@@ -60,7 +60,7 @@ struct EnumConfiguration: Template {
         let propertyDeclarations = properties.compactMap { property -> String? in
             guard let configProperty = property.value as? ConfigurationProperty<String> else { return nil }
             let value = configProperty.value(for: self.scheme)
-            return "    case \(configProperty.key)" + (value.isEmpty ? "" : " = \"\(value.replacingOccurrences(of: "\\", with: "\\\\"))\"")
+            return "    case \(configProperty.key)" + (value.isEmpty ? "" : #" = "\#(value.replacingOccurrences(of: #"\"#, with: #"\\"#))""#)
         }
         .sorted()
         .joined(separator: "\n")

@@ -30,7 +30,7 @@ private func dictionaryValue(_ dict: [String: Any]) -> String {
         let updatedValue: Any
         switch value {
         case is String:
-            updatedValue = "\"\(value)\""
+            updatedValue = #""\#(value)""#
         case is NSNumber:
             updatedValue = numericValue(value as! NSNumber)
         case is [String: Any]:
@@ -38,7 +38,7 @@ private func dictionaryValue(_ dict: [String: Any]) -> String {
         default:
             updatedValue = value
         }
-        return "\"\(key)\": \(updatedValue)"
+        return #""\#(key)": \#(updatedValue)"#
     }
     let contents = values.joined(separator: ", ")
     return "[\(contents.count > 0 ? contents : ":")]"
@@ -87,11 +87,14 @@ enum PropertyType: String {
     }
 
     func valueDeclaration(for value: Any, iv: IV, key: String?) -> String {
+        let stringValue = {
+            #""\#(value)""#
+        }
         switch self {
         case .string:
-            return "\"\(value)\""
+            return stringValue()
         case .url:
-            return "URL(string: \"\(value)\")!"
+            return "URL(string: \(stringValue()))!"
         case .encryptionKey:
             return byteArrayOutput(from: Array("\(value)".utf8))
         case .encrypted:
@@ -105,7 +108,7 @@ enum PropertyType: String {
         case .colour:
             return colourValue(for: value as? String)
         case .image:
-            return "UIImage(named: \"\(value)\")!"
+            return "UIImage(named: \(stringValue())!"
         case .bool:
             return "\(value as! Bool)"
         default:

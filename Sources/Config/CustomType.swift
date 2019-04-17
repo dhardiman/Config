@@ -28,7 +28,7 @@ struct CustomType {
     }
 
     var placeholders: [Placeholder] {
-        let placeholderRegex = try! NSRegularExpression(pattern: "\\{(.*?)\\}", options: [])
+        let placeholderRegex = try! NSRegularExpression(pattern: #"\{(.*?)\}"#, options: [])
         let matches = placeholderRegex.matches(in: initialiser, options: [], range: NSRange(location: 0, length: initialiser.count))
         return matches.map { Placeholder(placeholder: (initialiser as NSString).substring(with: $0.range(at: 1))) }
     }
