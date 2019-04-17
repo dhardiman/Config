@@ -129,4 +129,34 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: floatProperty)
         expect(actualValue).to(equal(expectedValue))
     }
+
+    func testItCanWriteStringArrayProperty() throws {
+        let stringArrayProperty = ConfigurationProperty<[String]>(key: "test", typeHint: "[String]", dict: [
+            "defaultValue": [
+                "one",
+                "two"
+            ]
+        ])
+        let expectedValue = #"    static let test: [String] = ["one", "two"]"#
+        let actualValue = try whenTheDeclarationIsWritten(for: stringArrayProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAColourProperty() throws {
+        let colourProperty = ConfigurationProperty<String>(key: "test", typeHint: "Colour", dict: [
+            "defaultValue": "#FF0000",
+        ])
+        let expectedValue = #"    static let test: UIColor = UIColor(red: 255.0 / 255.0, green: 0.0 / 255.0, blue: 0.0 / 255.0, alpha: 1.0)"#
+        let actualValue = try whenTheDeclarationIsWritten(for: colourProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnImageProperty() throws {
+        let imageProperty = ConfigurationProperty<String>(key: "test", typeHint: "Image", dict: [
+            "defaultValue": "image-name",
+            ])
+        let expectedValue = #"    static let test: UIImage = UIImage(named: "image-name")!"#
+        let actualValue = try whenTheDeclarationIsWritten(for: imageProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
 }
