@@ -93,4 +93,40 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: urlProperty)
         expect(actualValue).to(equal(expectedValue))
     }
+
+    func testItCanWriteAnIntProperty() throws {
+        let intProperty = ConfigurationProperty<Int>(key: "test", typeHint: "Int", dict: [
+            "defaultValue": 2,
+        ])
+        let expectedValue = #"    static let test: Int = 2"#
+        let actualValue = try whenTheDeclarationIsWritten(for: intProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteADoubleProperty() throws {
+        let doubleProperty = ConfigurationProperty<Double>(key: "test", typeHint: "Double", dict: [
+            "defaultValue": 2.3,
+        ])
+        let expectedValue = #"    static let test: Double = 2.3"#
+        let actualValue = try whenTheDeclarationIsWritten(for: doubleProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAFloatProperty() throws {
+        let floatProperty = ConfigurationProperty<Double>(key: "test", typeHint: "Float", dict: [
+            "defaultValue": 2.3,
+        ])
+        let expectedValue = #"    static let test: Float = 2.3"#
+        let actualValue = try whenTheDeclarationIsWritten(for: floatProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteABoolProperty() throws {
+        let floatProperty = ConfigurationProperty<Bool>(key: "test", typeHint: "Bool", dict: [
+            "defaultValue": true,
+            ])
+        let expectedValue = #"    static let test: Bool = true"#
+        let actualValue = try whenTheDeclarationIsWritten(for: floatProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
 }
