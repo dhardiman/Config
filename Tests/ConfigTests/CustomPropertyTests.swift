@@ -11,8 +11,8 @@ import Nimble
 import XCTest
 
 class CustomPropertyTests: XCTestCase {
-    func givenACustomType() -> CustomType {
-        return CustomType(source: givenATypeDictionary())!
+    func givenACustomType(for dictionary: [String: Any] = givenATypeDictionary()) -> CustomType {
+        return CustomType(source: dictionary)!
     }
 
     func givenADictionary() -> [String: Any] {
@@ -36,6 +36,22 @@ class CustomPropertyTests: XCTestCase {
                 "override": [
                     "firstplaceholder": "firstOverriddenValue",
                     "secondplaceholder": "secondOverriddenValue"
+                ]
+            ]
+        ]
+    }
+
+    func givenADictionaryWithTypedValues() -> [String: Any] {
+        return [
+            "description": "A description",
+            "defaultValue": [
+                "firstplaceholder": "firstValue",
+                "secondplaceholder": true
+            ],
+            "overrides": [
+                "override": [
+                    "firstplaceholder": "firstOverriddenValue",
+                    "secondplaceholder": false
                 ]
             ]
         ]
@@ -82,5 +98,38 @@ class CustomPropertyTests: XCTestCase {
             public static let test: CustomType = CustomType(oneThing: firstOverriddenValue, secondThing: secondOverriddenValue)
         """
         expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
+
+    func testItOutputsAPropertyForAnInitialiserWithoutPlaceholders() throws {
+        let property = CustomProperty(key: "test", customType: givenACustomType(for:  [
+            "typeName": "CustomType",
+            "initialiser": "CustomType()"
+        ]), dict: givenADictionaryWithValues())
+        let expectedValue = """
+            /// A description
+            public static let test: CustomType = CustomType()
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
+
+    func testItOutputsAPropertyForASinglePlaceholder() {
+        let property = CustomProperty(key: "test", customType: givenACustomType(for:  [
+            "typeName": "CustomType",
+            "initialiser": "CustomType(thingy: {$0})"
+            ]), dict: givenADictionary())
+        let expectedValue = """
+            /// A description
+            public static let test: CustomType = CustomType(thingy: test default value)
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
+
+    func testItOutputsAPropertyForATypeWithTypeAnnotations() {
+        let property = CustomProperty(key: "test", customType: givenACustomType(for: givenATypeDictionaryWithTypeAnnotations()), dict: givenADictionaryWithTypedValues())
+        let expectedValue = """
+            /// A description
+            public static let test: CustomType = CustomType(oneThing: "firstValue", secondThing: true)
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
 }
