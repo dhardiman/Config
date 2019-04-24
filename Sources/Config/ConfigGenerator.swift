@@ -13,7 +13,7 @@ public class ConfigGenerator {
     public init() {}
 
     public func run(_ arguments: [String]) throws {
-        let arguments = Arguments(argumentList: arguments)
+        let arguments = try Arguments(argumentList: arguments)
 
         let configFiles = try FileManager.default.contentsOfDirectory(at: arguments.configURL, includingPropertiesForKeys: nil, options: []).filter { $0.pathExtension == "config" }
 

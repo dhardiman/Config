@@ -35,18 +35,26 @@ extension Arguments {
         }
     }
 
-    init(argumentList: [String] = CommandLine.arguments) {
+    struct MissingArgumentError: Error {
+        let missingArguments: [String]
+    }
+
+    init(argumentList: [String] = CommandLine.arguments) throws {
         let argumentPairs: [Arguments.Option: String] = argumentList.arguments()
 
         guard let scheme = argumentPairs[.scheme],
             let configPath = argumentPairs[.configPath] else {
+            let missingArgs = [
+                argumentPairs.keys.contains(.scheme) ? nil : "scheme",
+                argumentPairs.keys.contains(.configPath) ? nil : "configPath"
+            ].compactMap { $0 }
             let lines: [String] = [
-                "Required arguments not provided.",
+                "Required arguments not provided: \(missingArgs.joined(separator: ", "))",
                 "Usage:",
                 Arguments.Option.all.compactMap { $0.usage }.joined(separator: "\n")
             ]
             print(lines.joined(separator: "\n"))
-            exit(1)
+            throw MissingArgumentError(missingArguments: missingArgs)
         }
 
         self.scheme = scheme
