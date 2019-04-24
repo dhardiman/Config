@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  macOStest:
+    macos:
+      xcode: "10.2.0"
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: |
+              swift test 2>&1 |
+              xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+workflows:
+  version: 2
+  run-tests:
+    jobs:
+      - macOStest
+
