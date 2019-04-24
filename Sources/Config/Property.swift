@@ -26,7 +26,8 @@ extension Property {
 }
 
 private func dictionaryValue(_ dict: [String: Any]) -> String {
-    let values = dict.map { (key, value) -> String in
+    let values = dict.sorted { $0.key < $1.key }
+        .map { (key, value) -> String in
         let updatedValue: Any
         switch value {
         case is String:

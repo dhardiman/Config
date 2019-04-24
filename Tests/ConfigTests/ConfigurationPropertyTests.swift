@@ -143,6 +143,18 @@ class ConfigurationPropertyTests: XCTestCase {
         expect(actualValue).to(equal(expectedValue))
     }
 
+    func testItCanWriteADictionaryProperty() throws {
+        let dictionaryProperty = ConfigurationProperty<[String: Any]>(key: "test", typeHint: "Dictionary", dict: [
+            "defaultValue": [
+                "one": "value",
+                "two": "other value"
+            ]
+        ])
+        let expectedValue = #"    static let test: [String: Any] = ["one": "value", "two": "other value"]"#
+        let actualValue = try whenTheDeclarationIsWritten(for: dictionaryProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
     func testItCanWriteAColourProperty() throws {
         let colourProperty = ConfigurationProperty<String>(key: "test", typeHint: "Colour", dict: [
             "defaultValue": "#FF0000",
