@@ -13,6 +13,7 @@ struct ReferenceProperty: Property {
     let typeName: String
     let overrides: [String: String]
     let associatedProperty: String? = nil
+    let description: String?
 
     init?(key: String, dict: [String: Any], typeName: String) {
         guard let defaultValue = dict["defaultValue"] as? String else {
@@ -26,6 +27,7 @@ struct ReferenceProperty: Property {
         } else {
             self.overrides = [:]
         }
+        self.description = dict["description"] as? String
     }
 
     func value(for scheme: String) -> String {
@@ -38,14 +40,19 @@ struct ReferenceProperty: Property {
     }
 
     func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+        var template: String = ""
+        if let description = description {
+            template += "\(String.indent(for: indentWidth))/// \(description)\n"
+        }
         if requiresNonObjCDeclarations {
-            return """
+            template += """
             \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") static var \(key): \(typeName) {
             \(String.indent(for: indentWidth + 1))return \(value(for: scheme))
             \(String.indent(for: indentWidth))}
             """
         } else {
-            return "\(String.indent(for: indentWidth))public static let \(key): \(typeName) = \(value(for: scheme))"
+            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let \(key): \(typeName) = \(value(for: scheme))"
         }
+        return template
     }
 }

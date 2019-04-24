@@ -41,7 +41,7 @@ class ConfigurationPropertyTests: XCTestCase {
         expect(actualValue).to(equal(expectedValue))
     }
 
-    func testItCaIndentADeclaration() throws {
+    func testItCanIndentADeclaration() throws {
         let stringProperty = givenAStringProperty()
         let expectedValue = #"                static let test: String = "test value""#
         let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, indentWidth: 3)
