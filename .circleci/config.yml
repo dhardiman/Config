@@ -10,6 +10,10 @@ jobs:
           command: |
               swift test 2>&1 |
               xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+      - store_test_results:
+          path: test_output
+      - store_artifacts:
+          path: test_output/results.html
 workflows:
   version: 2
   run-tests:
