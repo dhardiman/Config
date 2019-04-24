@@ -152,6 +152,15 @@ class ConfigurationPropertyTests: XCTestCase {
         expect(actualValue).to(equal(expectedValue))
     }
 
+    func testItCanWriteAGreyScaleColourProperty() throws {
+        let colourProperty = ConfigurationProperty<String>(key: "test", typeHint: "Colour", dict: [
+            "defaultValue": "#FF",
+            ])
+        let expectedValue = #"    static let test: UIColor = UIColor(white: 255.0 / 255.0, alpha: 1.0)"#
+        let actualValue = try whenTheDeclarationIsWritten(for: colourProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
     func testItCanWriteAnImageProperty() throws {
         let imageProperty = ConfigurationProperty<String>(key: "test", typeHint: "Image", dict: [
             "defaultValue": "image-name",
