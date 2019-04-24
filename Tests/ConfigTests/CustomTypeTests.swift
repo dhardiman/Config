@@ -11,13 +11,6 @@ import Nimble
 import XCTest
 
 class CustomTypeTests: XCTestCase {
-    func givenATypeDictionary() -> [String: Any] {
-        return [
-            "typeName": "CustomType",
-            "initialiser": "CustomType(oneThing: {firstplaceholder}, secondThing: {secondplaceholder})"
-        ]
-    }
-
     func testItCanParseACustomType() {
         let type = CustomType(source: givenATypeDictionary())
         expect(type?.typeName).to(equal("CustomType"))
@@ -61,13 +54,6 @@ class CustomTypeTests: XCTestCase {
         expect(type?.placeholders.last?.type).to(beNil())
     }
 
-    func givenATypeDictionaryWithTypeAnnotations() -> [String: Any] {
-        return [
-            "typeName": "CustomType",
-            "initialiser": "CustomType(oneThing: {firstplaceholder:String}, secondThing: {secondplaceholder:Bool})"
-        ]
-    }
-
     func testItCanParsePlaceholdersWithTypeAttributes() {
         let type = CustomType(source: givenATypeDictionaryWithTypeAnnotations())
         expect(type?.placeholders).to(haveCount(2))
@@ -76,4 +62,18 @@ class CustomTypeTests: XCTestCase {
         expect(type?.placeholders.last?.name).to(equal("secondplaceholder"))
         expect(type?.placeholders.last?.type).to(equal(.bool))
     }
+}
+
+func givenATypeDictionary() -> [String: Any] {
+    return [
+        "typeName": "CustomType",
+        "initialiser": "CustomType(oneThing: {firstplaceholder}, secondThing: {secondplaceholder})"
+    ]
+}
+
+func givenATypeDictionaryWithTypeAnnotations() -> [String: Any] {
+    return [
+        "typeName": "CustomType",
+        "initialiser": "CustomType(oneThing: {firstplaceholder:String}, secondThing: {secondplaceholder:Bool})"
+    ]
 }
