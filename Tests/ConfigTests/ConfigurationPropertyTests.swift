@@ -188,4 +188,12 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: unknownTypeProperty)
         expect(actualValue).to(beginWith(expectedValue))
     }
+
+    func testItCanProvideItsValueAsAKey() throws {
+        let property = givenAStringProperty()
+        let defaultKeyValue = property?.keyValue(for: "any")
+        expect(defaultKeyValue).to(equal("test value"))
+        let overriddenKeyValue = property?.keyValue(for: "hello")
+        expect(overriddenKeyValue).to(equal("hello value"))
+    }
 }
