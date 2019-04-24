@@ -25,6 +25,22 @@ class CustomPropertyTests: XCTestCase {
         ]
     }
 
+    func givenADictionaryWithValues() -> [String: Any] {
+        return [
+            "description": "A description",
+            "defaultValue": [
+                "firstplaceholder": "firstValue",
+                "secondplaceholder": "secondValue"
+            ],
+            "overrides": [
+                "override": [
+                    "firstplaceholder": "firstOverriddenValue",
+                    "secondplaceholder": "secondOverriddenValue"
+                ]
+            ]
+        ]
+    }
+
     func testItIsCreatedCorrectly() {
         let property = CustomProperty(key: "test", customType: givenACustomType(), dict: givenADictionary())
         expect(property.key).to(equal("test"))
@@ -39,5 +55,32 @@ class CustomPropertyTests: XCTestCase {
     func testItReportsItsTypeName() {
         let property = CustomProperty(key: "test", customType: givenACustomType(), dict: givenADictionary())
         expect(property.typeName).to(equal("CustomType"))
+    }
+
+    func testItOutputAPropertyDeclarationCorrectly() throws {
+        let property = CustomProperty(key: "test", customType: givenACustomType(), dict: givenADictionaryWithValues())
+        let expectedValue = """
+            /// A description
+            static let test: CustomType = CustomType(oneThing: firstValue, secondThing: secondValue)
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: false, indentWidth: 0)).to(equal(expectedValue))
+    }
+
+    func testItOutputAPublicPropertyDeclarationCorrectly() throws {
+        let property = CustomProperty(key: "test", customType: givenACustomType(), dict: givenADictionaryWithValues())
+        let expectedValue = """
+            /// A description
+            public static let test: CustomType = CustomType(oneThing: firstValue, secondThing: secondValue)
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
+
+    func testItOutputAPropertyDeclarationCorrectlyForAnOverriddenScheme() throws {
+        let property = CustomProperty(key: "test", customType: givenACustomType(), dict: givenADictionaryWithValues())
+        let expectedValue = """
+            /// A description
+            public static let test: CustomType = CustomType(oneThing: firstOverriddenValue, secondThing: secondOverriddenValue)
+        """
+        expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
 }
