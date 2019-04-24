@@ -179,4 +179,13 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: secretProperty)
         expect(actualValue).to(equal(expectedValue))
     }
+
+    func testItCanWriteAnUnknownTypeProperty() throws {
+        let unknownTypeProperty = ConfigurationProperty<String>(key: "test", typeHint: "Unknown", dict: [
+            "defaultValue": "somevalue",
+        ])
+        let expectedValue = "    static let test: Unknown = somevalue"
+        let actualValue = try whenTheDeclarationIsWritten(for: unknownTypeProperty)
+        expect(actualValue).to(beginWith(expectedValue))
+    }
 }
