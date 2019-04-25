@@ -105,6 +105,28 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItUsesOverridesAndOrdersProperties() throws {
+        let config = try ConfigurationFile(config: configWithOverride, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from scheme */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let anotherProperty: Int = 1
+
+            public static let schemeName: String = "scheme"
+
+            public static let testProperty: String = "A test"
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -132,5 +154,19 @@ let configWithEncryption: [String: Any] = [
     "somethingSecret": [
         "type": "Encrypted",
         "defaultValue": "secret"
+    ]
+]
+
+let configWithOverride: [String: Any] = [
+    "testProperty": [
+        "type": "String",
+        "defaultValue": "A test"
+    ],
+    "anotherProperty": [
+        "type": "Int",
+        "defaultValue": 0,
+        "overrides": [
+            "scheme": 1
+        ]
     ]
 ]
