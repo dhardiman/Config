@@ -149,6 +149,26 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItCanWriteNonObjcProperties() throws {
+        let config = try ConfigurationFile(config: givenAConfigDictionary(withTemplate: nonObjCTemplate), name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from any */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            @nonobjc public static var schemeName: String {
+                return "any"
+            }
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -202,4 +222,8 @@ let configWithReferenceProperty: [String: Any] = [
         "type": "Reference",
         "defaultValue": "property"
     ]
+]
+
+let nonObjCTemplate: [String: Any] = [
+    "requiresNonObjC": true
 ]
