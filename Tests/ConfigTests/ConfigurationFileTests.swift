@@ -252,7 +252,7 @@ class ConfigurationFileTests: XCTestCase {
         public enum Test {
             public static let bool: Bool = true
 
-            public static let dictionary: [String: Any] = [:]
+            public static let dictionary: [String: Any] = ["bool": true, "dict": [:], "key": 12]
 
             public static let float: Float = 0.0
 
@@ -387,7 +387,11 @@ private let configurationWithDifferentTypes: [String: Any] = [
     ],
     "dictionary": [
         "type": "Dictionary",
-        "defaultValue": [:]
+        "defaultValue": [
+            "key": 12,
+            "dict": [:],
+            "bool": true
+        ]
     ],
     "bool": [
         "type": "Bool",

@@ -19,12 +19,6 @@ protocol Property {
     func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String
 }
 
-extension Property {
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, isPublic: Bool, indentWidth: Int) -> String {
-        return propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: false, isPublic: isPublic, indentWidth: indentWidth)
-    }
-}
-
 private func dictionaryValue(_ dict: [String: Any]) -> String {
     let values = dict.sorted { $0.key < $1.key }
         .map { (key, value) -> String in
