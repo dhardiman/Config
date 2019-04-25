@@ -27,6 +27,40 @@ class EnumConfigurationTests: XCTestCase {
         ]
         expect(EnumConfiguration.canHandle(config: conf)).to(beFalse())
     }
+
+    func testItInitialisesFromAValidDictionary() throws {
+        let config = try EnumConfiguration(config: enumConfiguration, name: "Test", scheme: "Any", source: URL(fileURLWithPath: "/"))
+        expect(config.name).to(equal("Test"))
+        expect(config.scheme).to(equal("Any"))
+        expect(config.type).to(equal("String"))
+        expect(config.properties).to(haveCount(2))
+    }
+
+    func testItThrowsANoTypeErrorForAnInvalidConfig() {
+        do {
+            _ = try EnumConfiguration(config: invalidEnumConfiguration, name: "Test", scheme: "Any", source: URL(fileURLWithPath: "/"))
+            fail("Expected an error to be thrown")
+        } catch let error as EnumConfiguration.EnumError {
+            if error != .noType {
+                fail("Wrong error type thrown")
+            }
+        } catch {
+            fail("Wrong error type thrown")
+        }
+    }
+
+    func testItThrowsAnUnknownTypeErrorForAnUnsupportedRawType() {
+        do {
+            _ = try EnumConfiguration(config: intEnumConfiguration, name: "Test", scheme: "Any", source: URL(fileURLWithPath: "/"))
+            fail("Expected an error to be thrown")
+        } catch let error as EnumConfiguration.EnumError {
+            if error != .unknownType {
+                fail("Wrong error type thrown")
+            }
+        } catch {
+            fail("Wrong error type thrown")
+        }
+    }
 }
 
 let enumConfiguration: [String: Any] = [
@@ -58,5 +92,11 @@ let intEnumConfiguration: [String: Any] = [
         "overrides": [
             "scheme": 1
         ]
+    ]
+]
+
+let invalidEnumConfiguration: [String: Any] = [
+    "template": [
+        "name": "enum"
     ]
 ]
