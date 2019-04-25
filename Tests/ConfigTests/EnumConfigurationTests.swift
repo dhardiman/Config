@@ -33,7 +33,7 @@ class EnumConfigurationTests: XCTestCase {
         expect(config.name).to(equal("Test"))
         expect(config.scheme).to(equal("Any"))
         expect(config.type).to(equal("String"))
-        expect(config.properties).to(haveCount(2))
+        expect(config.properties).to(haveCount(3))
     }
 
     func testItThrowsANoTypeErrorForAnInvalidConfig() {
