@@ -294,19 +294,19 @@ class ConfigurationFileTests: XCTestCase {
     }
 }
 
-let extensionTemplate: [String: Any] = [
+private let extensionTemplate: [String: Any] = [
     "extensionOn": "UIColor",
     "extensionName": "Test"
 ]
 
-let importsTemplate: [String: Any] = [
+private let importsTemplate: [String: Any] = [
     "imports": [
         "SomeFramework",
         "AnotherFramework"
     ]
 ]
 
-let configWithEncryption: [String: Any] = [
+private let configWithEncryption: [String: Any] = [
     "encryptionKey": [
         "type": "EncryptionKey",
         "defaultValue": "the-key-to-the-secret"
@@ -317,7 +317,7 @@ let configWithEncryption: [String: Any] = [
     ]
 ]
 
-let configWithOverride: [String: Any] = [
+private let configWithOverride: [String: Any] = [
     "testProperty": [
         "type": "String",
         "defaultValue": "A test"
@@ -331,7 +331,7 @@ let configWithOverride: [String: Any] = [
     ]
 ]
 
-let configWithReferenceProperty: [String: Any] = [
+private let configWithReferenceProperty: [String: Any] = [
     "property": [
         "type": "String",
         "defaultValue": "A test"
@@ -342,11 +342,11 @@ let configWithReferenceProperty: [String: Any] = [
     ]
 ]
 
-let nonObjCTemplate: [String: Any] = [
+private let nonObjCTemplate: [String: Any] = [
     "requiresNonObjC": true
 ]
 
-let groupedConfig: [String: Any] = [
+private let groupedConfig: [String: Any] = [
     "firstGroup": [
         "testProperty": [
             "type": "String",
@@ -361,7 +361,7 @@ let groupedConfig: [String: Any] = [
     ]
 ]
 
-let configWithAssociatedProperties: [String: Any] = [
+private let configWithAssociatedProperties: [String: Any] = [
     "host": [
         "description": "API Host",
         "type": "String",
@@ -380,7 +380,7 @@ let configWithAssociatedProperties: [String: Any] = [
     ]
 ]
 
-let configurationWithDifferentTypes: [String: Any] = [
+private let configurationWithDifferentTypes: [String: Any] = [
     "float": [
         "type": "Float",
         "defaultValue": 0.0
@@ -399,7 +399,7 @@ let configurationWithDifferentTypes: [String: Any] = [
     ]
 ]
 
-let configurationWithCustomType: [String: Any] = [
+private let configurationWithCustomType: [String: Any] = [
     "template": [
         "customTypes": [
             [
