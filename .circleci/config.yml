@@ -11,6 +11,9 @@ jobs:
           command: |
               swift test --enable-code-coverage 2>&1 |
               xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+      - run:
+          name: Post Coverage
+          command: bundle exec slather              
       - store_test_results:
           path: test_output
       - store_artifacts:
