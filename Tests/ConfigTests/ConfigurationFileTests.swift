@@ -169,6 +169,32 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItOutputsGroups() throws {
+        let config = try ConfigurationFile(config: groupedConfig, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from scheme */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let schemeName: String = "scheme"
+
+            public enum FirstGroup {
+                public static let testProperty: String = "A test"
+            }
+
+            public enum SecondGroup {
+                public static let anotherProperty: Int = 0
+            }
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -226,4 +252,19 @@ let configWithReferenceProperty: [String: Any] = [
 
 let nonObjCTemplate: [String: Any] = [
     "requiresNonObjC": true
+]
+
+let groupedConfig: [String: Any] = [
+    "firstGroup": [
+        "testProperty": [
+            "type": "String",
+            "defaultValue": "A test"
+        ]
+    ],
+    "secondGroup": [
+        "anotherProperty": [
+            "type": "Int",
+            "defaultValue": 0
+        ]
+    ]
 ]
