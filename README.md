@@ -1,4 +1,6 @@
 # Config
+[![CircleCI](https://circleci.com/gh/dhardiman/Config.svg?style=svg)](https://circleci.com/gh/dhardiman/Config)
+
 This is a command line tool for generating configuration files from a custom JSON schema. Loosely based on [ConfigGenerator](https://github.com/theappbusiness/ConfigGenerator), but significantly more extensible.
 
 ##### Why not just use ConfigGenerator?
