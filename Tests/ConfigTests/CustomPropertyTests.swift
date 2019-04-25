@@ -78,6 +78,18 @@ class CustomPropertyTests: XCTestCase {
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
 
+    func testItOutputsAPropertyForASingleNamedPlaceholder() {
+        let property = CustomProperty(key: "test", customType: givenACustomType(for:  [
+            "typeName": "CustomType",
+            "initialiser": "CustomType(thingy: {firstplaceholder:String})"
+            ]), dict: givenADictionaryWithValues())
+        let expectedValue = """
+            /// A description
+            public static let test: CustomType = CustomType(thingy: "firstValue")
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
+
     func testItOutputsAPropertyForATypeWithTypeAnnotations() {
         let property = CustomProperty(key: "test", customType: givenACustomType(for: givenATypeDictionaryWithTypeAnnotations()), dict: givenADictionaryWithTypedValues())
         let expectedValue = """

@@ -267,6 +267,26 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testPropertiesAreOutputForCustomTypes() throws {
+        let config = try ConfigurationFile(config: configurationWithCustomType, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from any */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let property: CustomType = CustomType(param: "Value")
+
+            public static let schemeName: String = "any"
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -378,3 +398,21 @@ let configurationWithDifferentTypes: [String: Any] = [
         "defaultValue": []
     ]
 ]
+
+let configurationWithCustomType: [String: Any] = [
+    "template": [
+        "customTypes": [
+            [
+                "typeName": "CustomType",
+                "initialiser": "CustomType(param: {param:String})"
+            ]
+        ]
+    ],
+    "property": [
+        "type": "CustomType",
+        "defaultValue": [
+            "param": "Value"
+        ]
+    ]
+]
+

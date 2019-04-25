@@ -143,7 +143,13 @@ private struct CustomPropertyValue {
         case 0:
             return type.initialiser
         case 1:
-            return type.initialiser.replacingOccurrences(of: "{$0}", with: valueString(from: value))
+            let actualValue: String
+            if let dictionary = value as? [String: Any] {
+                actualValue = valueString(for: type.placeholders[0], from: dictionary)
+            } else {
+                actualValue = valueString(from: value)
+            }
+            return type.initialiser.replacingOccurrences(of: "\(type.placeholders[0])", with: actualValue)
         default:
             let dictionaryValue = value as! [String: Any]
             return type.placeholders.reduce(type.initialiser) { template, placeholder in
