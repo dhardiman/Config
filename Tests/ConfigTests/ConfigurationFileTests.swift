@@ -241,6 +241,32 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testPropertiesAreOutputForVariousTypes() throws {
+        let config = try ConfigurationFile(config: configurationWithDifferentTypes, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from any */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let bool: Bool = true
+
+            public static let dictionary: [String: Any] = [:]
+
+            public static let float: Float = 0.0
+
+            public static let schemeName: String = "any"
+
+            public static let stringArray: [String] = []
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -331,5 +357,24 @@ let configWithAssociatedProperties: [String: Any] = [
         "overrides": [
             "dave.com": "the-prod-key"
         ]
+    ]
+]
+
+let configurationWithDifferentTypes: [String: Any] = [
+    "float": [
+        "type": "Float",
+        "defaultValue": 0.0
+    ],
+    "dictionary": [
+        "type": "Dictionary",
+        "defaultValue": [:]
+    ],
+    "bool": [
+        "type": "Bool",
+        "defaultValue": true
+    ],
+    "stringArray": [
+        "type": "[String]",
+        "defaultValue": []
     ]
 ]
