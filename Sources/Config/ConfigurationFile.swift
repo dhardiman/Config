@@ -11,7 +11,7 @@ import Foundation
 private let outputTemplate = """
 /* {filename} auto-generated from {scheme} */
 
-import Foundation{imports}
+{imports}
 
 // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
 public {entityType} {name} {
@@ -177,7 +177,7 @@ struct ConfigurationFile: Template {
 
         self.template = config["template"] as? [String: Any]
 
-        self.imports = (self.template?["imports"] as? [String]) ?? []
+        self.imports = ["Foundation"] + ((self.template?["imports"] as? [String]) ?? [])
 
         self.customTypes = CustomType.typeArray(from: self.template)
 
@@ -221,8 +221,7 @@ struct ConfigurationFile: Template {
         let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil)
 
         let entityType = extendedClass != nil ? "extension" : "enum"
-        let additionalImports = imports.map { "import \($0)" }.joined(separator: "\n")
-        let importsString = additionalImports.isEmpty ? "" : "\n" + additionalImports
+        let importsString = imports.sorted().map { "import \($0)" }.joined(separator: "\n")
 
         return outputTemplate
             .replacingOccurrences(of: "{filename}", with: "\(filename ?? name).swift")

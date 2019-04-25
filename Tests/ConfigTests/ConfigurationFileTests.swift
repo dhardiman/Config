@@ -60,6 +60,27 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItCanOutputAdditionalImports() throws {
+        let dict = givenAConfigDictionary(withTemplate: importsTemplate)
+        let config = try ConfigurationFile(config: dict, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from any */
+
+        import AnotherFramework
+        import Foundation
+        import SomeFramework
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let schemeName: String = "any"
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -70,4 +91,11 @@ class ConfigurationFileTests: XCTestCase {
 let extensionTemplate: [String: Any] = [
     "extensionOn": "UIColor",
     "extensionName": "Test"
+]
+
+let importsTemplate: [String: Any] = [
+    "imports": [
+        "SomeFramework",
+        "AnotherFramework"
+    ]
 ]
