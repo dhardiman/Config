@@ -5,10 +5,11 @@ jobs:
       xcode: "10.2.0"
     steps:
       - checkout
+      - run: bundle install      
       - run:
           name: Run Tests
           command: |
-              swift test 2>&1 |
+              swift test --enable-code-coverage 2>&1 |
               xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
       - store_test_results:
           path: test_output

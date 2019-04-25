@@ -1,0 +1,9 @@
+coverage_service: coveralls
+ci_service: circleci
+xcodeproj: Config.xcodeproj
+scheme: Config-Package
+build-directory: ./build/debug/codecov
+ignore:
+  - .build/*
+  - Carthage/*
+  - Tests/*
