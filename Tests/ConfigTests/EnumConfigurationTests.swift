@@ -61,6 +61,22 @@ class EnumConfigurationTests: XCTestCase {
             fail("Wrong error type thrown")
         }
     }
+
+    func testItCanOutputAConfigFile() throws {
+        let config = try EnumConfiguration(config: enumConfiguration, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test auto-generated from scheme */
+        import Foundation
+
+        public enum Test: String {
+            case emptyCase
+            case firstCase = "Some Value"
+            case secondCase = "Overridden Value"
+        }
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
 }
 
 let enumConfiguration: [String: Any] = [
@@ -69,6 +85,7 @@ let enumConfiguration: [String: Any] = [
         "rawType": "String"
     ],
     "firstCase": [
+        "description": "A description",
         "defaultValue": "Some Value"
     ],
     "secondCase": [
@@ -76,6 +93,9 @@ let enumConfiguration: [String: Any] = [
         "overrides": [
             "scheme": "Overridden Value"
         ]
+    ],
+    "emptyCase": [
+        "defaultValue": ""
     ]
 ]
 
