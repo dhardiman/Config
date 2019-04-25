@@ -12,6 +12,10 @@ jobs:
               swift test --enable-code-coverage 2>&1 |
               xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
       - run:
+          name: Generate xcode project for code coverage
+          command: |
+              swift package generate-xcodeproj
+      - run:
           name: Post Coverage
           command: bundle exec slather              
       - store_test_results:
