@@ -195,6 +195,52 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testAssociatedPropertiesAreOutputForDefaults() throws {
+        let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from scheme */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            /// API Host
+            public static let host: String = "dev.dave.com"
+
+            public static let hostKey: String = "a-secret-key"
+
+            public static let schemeName: String = "scheme"
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
+    func testAssociatedPropertiesAreOutputForScheme() throws {
+        let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", scheme: "prod", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from prod */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            /// API Host
+            public static let host: String = "dave.com"
+
+            public static let hostKey: String = "the-prod-key"
+
+            public static let schemeName: String = "prod"
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -265,6 +311,25 @@ let groupedConfig: [String: Any] = [
         "anotherProperty": [
             "type": "Int",
             "defaultValue": 0
+        ]
+    ]
+]
+
+let configWithAssociatedProperties: [String: Any] = [
+    "host": [
+        "description": "API Host",
+        "type": "String",
+        "defaultValue": "dev.dave.com",
+        "overrides": [
+            "prod": "dave.com"
+        ]
+    ],
+    "hostKey": [
+        "type": "String",
+        "associatedProperty": "host",
+        "defaultValue": "a-secret-key",
+        "overrides": [
+            "dave.com": "the-prod-key"
         ]
     ]
 ]
