@@ -127,6 +127,28 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItItCanWriteReferenceProperties() throws {
+        let config = try ConfigurationFile(config: configWithReferenceProperty, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from scheme */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let property: String = "A test"
+
+            public static let referenceProperty: String = property
+
+            public static let schemeName: String = "scheme"
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -168,5 +190,16 @@ let configWithOverride: [String: Any] = [
         "overrides": [
             "scheme": 1
         ]
+    ]
+]
+
+let configWithReferenceProperty: [String: Any] = [
+    "property": [
+        "type": "String",
+        "defaultValue": "A test"
+    ],
+    "referenceProperty": [
+        "type": "Reference",
+        "defaultValue": "property"
     ]
 ]
