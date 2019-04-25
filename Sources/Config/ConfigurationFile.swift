@@ -225,7 +225,7 @@ struct ConfigurationFile: Template {
         let importsString = additionalImports.isEmpty ? "" : "\n" + additionalImports
 
         return outputTemplate
-            .replacingOccurrences(of: "{filename}", with: "\(name).swift")
+            .replacingOccurrences(of: "{filename}", with: "\(filename ?? name).swift")
             .replacingOccurrences(of: "{imports}", with: importsString)
             .replacingOccurrences(of: "{entityType}", with: entityType)
             .replacingOccurrences(of: "{name}", with: extendedClass ?? name)
