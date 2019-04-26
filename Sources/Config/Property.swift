@@ -65,6 +65,7 @@ enum PropertyType: String {
     case colour = "Colour"
     case reference = "Reference"
     case image = "Image"
+    case regex = "Regex"
 
     var typeName: String {
         switch self {
@@ -76,6 +77,8 @@ enum PropertyType: String {
             return "UIColor"
         case .image:
             return "UIImage"
+        case .regex:
+            return "NSRegularExpression"
         default:
             return rawValue
         }
@@ -109,6 +112,8 @@ enum PropertyType: String {
             return #"UIImage(named: "\#(value)")!"#
         case .bool:
             return "\(value as! Bool)"
+        case .regex:
+            return "try! NSRegularExpression(pattern: \(stringValue()), options: [])"
         default:
             return "\(value)"
         }

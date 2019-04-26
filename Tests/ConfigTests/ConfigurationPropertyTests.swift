@@ -225,4 +225,13 @@ class ConfigurationPropertyTests: XCTestCase {
         let overriddenKeyValue = property?.keyValue(for: "hello")
         expect(overriddenKeyValue).to(equal("hello value"))
     }
+
+    func testItCanWriteARegexProperty() throws {
+        let imageProperty = ConfigurationProperty<String>(key: "test", typeHint: "Regex", dict: [
+            "defaultValue": "an\\sexpression",
+            ])
+        let expectedValue = ##"    static let test: NSRegularExpression = try! NSRegularExpression(pattern: #"an\sexpression"#, options: [])"##
+        let actualValue = try whenTheDeclarationIsWritten(for: imageProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
 }
