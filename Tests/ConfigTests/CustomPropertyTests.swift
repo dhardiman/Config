@@ -98,6 +98,22 @@ class CustomPropertyTests: XCTestCase {
         """
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
+
+    func testItOutputsAStringWithEscapedSlashesCorrectly() {
+        let property = CustomProperty(key: "test", customType: givenACustomType(for: regexCustomType), dict: regexDictionary)
+        let expectedValue = """
+            public static let test: NSRegularExpression = try! NSRegularExpression(expression: "^.*\\@.*\\.[a-zA-Z]{2,3}$", options: [])
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
+
+    func testItOutputsAStringWithEscapedSlashesCorrectlyForSingleValue() {
+        let property = CustomProperty(key: "test", customType: givenACustomType(for: regexCustomType), dict: regexSingleValueDictionary)
+        let expectedValue = """
+            public static let test: NSRegularExpression = try! NSRegularExpression(expression: "^.*\\@.*\\.[a-zA-Z]{2,3}$", options: [])
+        """
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
+    }
 }
 
 class CustomPropertyArrayTests: XCTestCase {
@@ -211,3 +227,18 @@ private func givenADictionaryWithTypedValues() -> [String: Any] {
         ]
     ]
 }
+
+private let regexCustomType: [String: Any] = [
+    "typeName": "NSRegularExpression",
+    "initialiser": "try! NSRegularExpression(expression: {expression:String}, options: [])"
+]
+
+private let regexDictionary: [String: Any] = [
+    "defaultValue": [
+        "expression": "^.*\\@.*\\.[a-zA-Z]{2,3}$"
+    ]
+]
+
+private let regexSingleValueDictionary: [String: Any] = [
+    "defaultValue": "^.*\\@.*\\.[a-zA-Z]{2,3}$"
+]

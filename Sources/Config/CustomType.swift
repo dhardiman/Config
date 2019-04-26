@@ -118,7 +118,12 @@ private func valueString(from value: Any?) -> String {
 }
 
 private func valueString(for placeholder: Placeholder, from dictionary: [String: Any]) -> String {
-    guard let value = dictionary[placeholder.name], let unusedIV = try? IV(dict: dictionary) else { return "" }
+    guard let value = dictionary[placeholder.name] else { return "" }
+    return valueString(for: placeholder, from: value)
+}
+
+private func valueString(for placeholder: Placeholder, from value: Any) -> String {
+    guard let unusedIV = try? IV(dict: [:]) else { return "" }
     if let type = placeholder.type {
         return type.valueDeclaration(for: value, iv: unusedIV, key: nil)
     } else {
@@ -146,6 +151,8 @@ private struct CustomPropertyValue {
             let actualValue: String
             if let dictionary = value as? [String: Any] {
                 actualValue = valueString(for: type.placeholders[0], from: dictionary)
+            } else if type.placeholders[0].type != nil {
+                actualValue = valueString(for: type.placeholders[0], from: value)
             } else {
                 actualValue = valueString(from: value)
             }
