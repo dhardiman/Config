@@ -55,6 +55,7 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Bool`: A boolean value
 - `Colour`: A colour in hex format, will be output as a `UIColor`.
 - `Image`: The name of an image. Will be converted to `UIImage(named: "the value")!`.
+- `Regex`: A regular expression pattern. Will be converted to `try! NSRegularExpression(patthen: "the value", options: [])`
 - `EncryptionKey`: A key to use to encrypt sensitive info.
 - `Encrypted`: A value that should be encrypted using the provided key
 - `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
