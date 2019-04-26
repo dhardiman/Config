@@ -26,12 +26,12 @@ struct Configuration {
     let properties: [String: Property]
     let childConfigurations: [String: Configuration]
 
-    init(config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType]) {
+    init(config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?) {
         properties = config.reduce([String: Property]()) { properties, pair in
-            return parseNextProperty(properties: properties, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes)
+            return parseNextProperty(properties: properties, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
         }
         childConfigurations = config.reduce([String: Configuration]()) { configurations, pair in
-            return parseNextConfiguration(configurations: configurations, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes)
+            return parseNextConfiguration(configurations: configurations, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
         }
     }
 
@@ -90,10 +90,12 @@ extension String {
     }
 }
 
-func parseNextProperty(properties: [String: Property], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType]) -> [String: Property] {
-    guard let dict = pair.value as? [String: Any],
-        let typeHintValue = dict["type"] as? String else {
-            return properties
+func parseNextProperty(properties: [String: Property], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?) -> [String: Property] {
+    guard let dict = pair.value as? [String: Any] else {
+        return properties
+    }
+    guard let typeHintValue = (dict["type"] as? String ?? defaultType?.rawValue) else {
+        return properties
     }
     var copy = properties
     if let typeHint = PropertyType(rawValue: typeHintValue) {
@@ -147,12 +149,12 @@ private func referenceDict(for key: String, from config: [String: Any], or refer
     return referenceSource?[key] as? [String: Any]
 }
 
-func parseNextConfiguration(configurations: [String: Configuration], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType]) -> [String: Configuration] {
-    guard let dict = pair.value as? [String: Any], dict["type"] == nil, pair.key != "template" else {
+func parseNextConfiguration(configurations: [String: Configuration], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?) -> [String: Configuration] {
+    guard let dict = pair.value as? [String: Any], dict["defaultValue"] == nil, pair.key != "template" else {
         return configurations
     }
     var copy = configurations
-    copy[pair.key] = Configuration(config: dict, referenceSource: referenceSource, customTypes: customTypes)
+    copy[pair.key] = Configuration(config: dict, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
     return copy
 }
 
@@ -171,6 +173,8 @@ struct ConfigurationFile: Template {
 
     let customTypes: [CustomType]
 
+    let defaultType: PropertyType?
+
     init(config: [String: Any], name: String, scheme: String, source: URL) throws {
         self.scheme = scheme
         self.name = name
@@ -181,6 +185,12 @@ struct ConfigurationFile: Template {
 
         self.customTypes = CustomType.typeArray(from: self.template)
 
+        if let defaultType = template?["defaultType"] as? String {
+            self.defaultType = PropertyType(rawValue: defaultType)
+        } else {
+            self.defaultType = nil
+        }
+
         var referenceSource: [String: Any]?
         if let referenceSourceFileName = template?["referenceSource"] as? String {
             let referenceSourceURL = source.appendingPathComponent(referenceSourceFileName).appendingPathExtension("config")
@@ -189,7 +199,7 @@ struct ConfigurationFile: Template {
 
         iv = try IV(dict: config)
 
-        let root = Configuration(config: config, referenceSource: referenceSource, customTypes: customTypes)
+        let root = Configuration(config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
         var parsedProperties = root.properties
 
         encryptionKey = parsedProperties.values.compactMap { $0 as? ConfigurationProperty<String> }

@@ -287,6 +287,26 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItUsesADefaultTypeIfOneIsNotSpecified() throws {
+        let config = try ConfigurationFile(config: configurationWithDefaultType, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from any */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let property: String = #"test value"#
+
+            public static let schemeName: String = #"any"#
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -420,3 +440,11 @@ private let configurationWithCustomType: [String: Any] = [
     ]
 ]
 
+private let configurationWithDefaultType: [String: Any] = [
+    "template": [
+        "defaultType": "String"
+    ],
+    "property": [
+        "defaultValue": "test value"
+    ]
+]
