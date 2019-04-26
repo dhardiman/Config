@@ -82,8 +82,11 @@ enum PropertyType: String {
     }
 
     func valueDeclaration(for value: Any, iv: IV, key: String?) -> String {
-        let stringValue = {
-            "#\"\(value)\"#"
+        let stringValue = { () -> String in
+            if let string = value as? String, string.isEmpty {
+                return "\"\""
+            }
+            return "#\"\(value)\"#"
         }
         switch self {
         case .string:

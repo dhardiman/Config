@@ -16,7 +16,8 @@ class ConfigurationPropertyTests: XCTestCase {
             "defaultValue": "test value",
             "overrides": [
                 "hello": "hello value",
-                "pattern": "pattern value"
+                "pattern": "pattern value",
+                "empty": ""
             ]
         ])
     }
@@ -31,6 +32,13 @@ class ConfigurationPropertyTests: XCTestCase {
         let stringProperty = givenAStringProperty()
         let expectedValue = ##"    static let test: String = #"test value"#"##
         let actualValue = try whenTheDeclarationIsWritten(for: stringProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteADeclarationForAnEmptyStringProperty() throws {
+        let stringProperty = givenAStringProperty()
+        let expectedValue = ##"    static let test: String = """##
+        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, scheme: "empty")
         expect(actualValue).to(equal(expectedValue))
     }
 
@@ -125,7 +133,7 @@ class ConfigurationPropertyTests: XCTestCase {
     func testItCanWriteABoolProperty() throws {
         let floatProperty = ConfigurationProperty<Bool>(key: "test", typeHint: "Bool", dict: [
             "defaultValue": true,
-            ])
+        ])
         let expectedValue = #"    static let test: Bool = true"#
         let actualValue = try whenTheDeclarationIsWritten(for: floatProperty)
         expect(actualValue).to(equal(expectedValue))
