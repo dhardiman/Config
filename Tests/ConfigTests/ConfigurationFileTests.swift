@@ -29,7 +29,7 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let schemeName: String = "any"
+            public static let schemeName: String = #"any"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -72,7 +72,7 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let schemeName: String = "any"
+            public static let schemeName: String = #"any"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -94,7 +94,7 @@ class ConfigurationFileTests: XCTestCase {
 
             public static let encryptionKeyIV: [UInt8] = [UInt8(97), UInt8(53), UInt8(101), UInt8(49), UInt8(49), UInt8(97), UInt8(100), UInt8(57), UInt8(98), UInt8(53), UInt8(56), UInt8(55), UInt8(52), UInt8(56), UInt8(101), UInt8(48), UInt8(52), UInt8(56), UInt8(57), UInt8(57), UInt8(56), UInt8(97), UInt8(102), UInt8(53), UInt8(55), UInt8(55), UInt8(97), UInt8(55), UInt8(98), UInt8(97), UInt8(48), UInt8(102)]
 
-            public static let schemeName: String = "any"
+            public static let schemeName: String = #"any"#
 
             public static let somethingSecret: [UInt8] = [UInt8(72), UInt8(248), UInt8(24), UInt8(73), UInt8(30), UInt8(207), UInt8(159), UInt8(0), UInt8(65), UInt8(147), UInt8(20), UInt8(183), UInt8(214), UInt8(231), UInt8(169), UInt8(3)]
         }
@@ -116,9 +116,9 @@ class ConfigurationFileTests: XCTestCase {
         public enum Test {
             public static let anotherProperty: Int = 1
 
-            public static let schemeName: String = "scheme"
+            public static let schemeName: String = #"scheme"#
 
-            public static let testProperty: String = "A test"
+            public static let testProperty: String = #"A test"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -136,11 +136,11 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let property: String = "A test"
+            public static let property: String = #"A test"#
 
             public static let referenceProperty: String = property
 
-            public static let schemeName: String = "scheme"
+            public static let schemeName: String = #"scheme"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -159,7 +159,7 @@ class ConfigurationFileTests: XCTestCase {
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
             @nonobjc public static var schemeName: String {
-                return "any"
+                return #"any"#
             }
         }
 
@@ -178,10 +178,10 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let schemeName: String = "scheme"
+            public static let schemeName: String = #"scheme"#
 
             public enum FirstGroup {
-                public static let testProperty: String = "A test"
+                public static let testProperty: String = #"A test"#
             }
 
             public enum SecondGroup {
@@ -205,11 +205,11 @@ class ConfigurationFileTests: XCTestCase {
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
             /// API Host
-            public static let host: String = "dev.dave.com"
+            public static let host: String = #"dev.dave.com"#
 
-            public static let hostKey: String = "a-secret-key"
+            public static let hostKey: String = #"a-secret-key"#
 
-            public static let schemeName: String = "scheme"
+            public static let schemeName: String = #"scheme"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -228,11 +228,11 @@ class ConfigurationFileTests: XCTestCase {
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
             /// API Host
-            public static let host: String = "dave.com"
+            public static let host: String = #"dave.com"#
 
-            public static let hostKey: String = "the-prod-key"
+            public static let hostKey: String = #"the-prod-key"#
 
-            public static let schemeName: String = "prod"
+            public static let schemeName: String = #"prod"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -256,7 +256,7 @@ class ConfigurationFileTests: XCTestCase {
 
             public static let float: Float = 0.0
 
-            public static let schemeName: String = "any"
+            public static let schemeName: String = #"any"#
 
             public static let stringArray: [String] = []
         }
@@ -276,9 +276,9 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let property: CustomType = CustomType(param: "Value")
+            public static let property: CustomType = CustomType(param: #"Value"#)
 
-            public static let schemeName: String = "any"
+            public static let schemeName: String = #"any"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command

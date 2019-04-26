@@ -70,8 +70,8 @@ class EnumConfigurationTests: XCTestCase {
 
         public enum Test: String {
             case emptyCase
-            case firstCase = "Some Value"
-            case secondCase = "Overridden Value"
+            case firstCase = #"Some Value"#
+            case secondCase = #"Overridden Value"#
         }
 
         """

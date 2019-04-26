@@ -85,7 +85,7 @@ class CustomPropertyTests: XCTestCase {
             ]), dict: givenADictionaryWithValues())
         let expectedValue = """
             /// A description
-            public static let test: CustomType = CustomType(thingy: "firstValue")
+            public static let test: CustomType = CustomType(thingy: #"firstValue"#)
         """
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
@@ -94,7 +94,7 @@ class CustomPropertyTests: XCTestCase {
         let property = CustomProperty(key: "test", customType: givenACustomType(for: givenATypeDictionaryWithTypeAnnotations()), dict: givenADictionaryWithTypedValues())
         let expectedValue = """
             /// A description
-            public static let test: CustomType = CustomType(oneThing: "firstValue", secondThing: true)
+            public static let test: CustomType = CustomType(oneThing: #"firstValue"#, secondThing: true)
         """
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
@@ -102,7 +102,7 @@ class CustomPropertyTests: XCTestCase {
     func testItOutputsAStringWithEscapedSlashesCorrectly() {
         let property = CustomProperty(key: "test", customType: givenACustomType(for: regexCustomType), dict: regexDictionary)
         let expectedValue = """
-            public static let test: NSRegularExpression = try! NSRegularExpression(expression: "^.*\\@.*\\.[a-zA-Z]{2,3}$", options: [])
+            public static let test: NSRegularExpression = try! NSRegularExpression(expression: #"^.*\\@.*\\.[a-zA-Z]{2,3}$"#, options: [])
         """
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
@@ -110,7 +110,7 @@ class CustomPropertyTests: XCTestCase {
     func testItOutputsAStringWithEscapedSlashesCorrectlyForSingleValue() {
         let property = CustomProperty(key: "test", customType: givenACustomType(for: regexCustomType), dict: regexSingleValueDictionary)
         let expectedValue = """
-            public static let test: NSRegularExpression = try! NSRegularExpression(expression: "^.*\\@.*\\.[a-zA-Z]{2,3}$", options: [])
+            public static let test: NSRegularExpression = try! NSRegularExpression(expression: #"^.*\\@.*\\.[a-zA-Z]{2,3}$"#, options: [])
         """
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
@@ -137,7 +137,7 @@ class CustomPropertyArrayTests: XCTestCase {
         let property = CustomPropertyArray(key: "test", customType: givenACustomType(for: givenATypeDictionaryWithTypeAnnotations()), dict: givenADictionaryWithArrayValues())
         let expectedValue = """
             /// A description
-            public static let test: [CustomType] = [CustomType(oneThing: "firstValue", secondThing: true)]
+            public static let test: [CustomType] = [CustomType(oneThing: #"firstValue"#, secondThing: true)]
         """
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
@@ -146,7 +146,7 @@ class CustomPropertyArrayTests: XCTestCase {
         let property = CustomPropertyArray(key: "test", customType: givenACustomType(for: givenATypeDictionaryWithTypeAnnotations()), dict: givenADictionaryWithArrayValues())
         let expectedValue = """
             /// A description
-            public static let test: [CustomType] = [CustomType(oneThing: "firstOverriddenValue", secondThing: false)]
+            public static let test: [CustomType] = [CustomType(oneThing: #"firstOverriddenValue"#, secondThing: false)]
         """
         expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }

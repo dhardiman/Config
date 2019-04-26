@@ -83,13 +83,13 @@ enum PropertyType: String {
 
     func valueDeclaration(for value: Any, iv: IV, key: String?) -> String {
         let stringValue = {
-            #""\#(value)""#
+            "#\"\(value)\"#"
         }
         switch self {
         case .string:
             return stringValue()
         case .url:
-            return "URL(string: \(stringValue()))!"
+            return #"URL(string: "\#(value)")!"#
         case .encryptionKey:
             return byteArrayOutput(from: Array("\(value)".utf8))
         case .encrypted:
@@ -103,7 +103,7 @@ enum PropertyType: String {
         case .colour:
             return colourValue(for: value as? String)
         case .image:
-            return "UIImage(named: \(stringValue()))!"
+            return #"UIImage(named: "\#(value)")!"#
         case .bool:
             return "\(value as! Bool)"
         default:

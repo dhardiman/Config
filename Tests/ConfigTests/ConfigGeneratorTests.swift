@@ -99,8 +99,8 @@ private let expectedStrings = [
 
     public enum enumconfig: String {
         case emptyCase
-        case firstCase = "Some Value"
-        case secondCase = "Another Value"
+        case firstCase = #"Some Value"#
+        case secondCase = #"Another Value"#
     }
 
     """,
@@ -113,7 +113,7 @@ private let expectedStrings = [
     public enum standard {
         public static let float: Float = 0.0
 
-        public static let schemeName: String = "any"
+        public static let schemeName: String = #"any"#
     }
 
     // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
