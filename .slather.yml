@@ -2,6 +2,7 @@ coverage_service: coveralls
 ci_service: circleci
 xcodeproj: Config.xcodeproj
 scheme: Config-Package
+binary_basename: Config
 ignore:
   - .build/*
   - Carthage/*
