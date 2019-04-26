@@ -276,6 +276,8 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
+            public static let arrayProperty: [CustomType] = [CustomType(param: #"Value"#)]
+
             public static let property: CustomType = CustomType(param: #"Value"#)
 
             public static let schemeName: String = #"any"#
@@ -436,6 +438,14 @@ private let configurationWithCustomType: [String: Any] = [
         "type": "CustomType",
         "defaultValue": [
             "param": "Value"
+        ]
+    ],
+    "arrayProperty": [
+        "type": "[CustomType]",
+        "defaultValue": [
+            [
+                "param": "Value"
+            ]
         ]
     ]
 ]
