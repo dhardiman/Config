@@ -5,16 +5,16 @@ jobs:
       xcode: "10.2.0"
     steps:
       - checkout
-      - run: bundle install      
-      - run:
-          name: Run Tests
-          command: |
-              swift test --enable-code-coverage 2>&1 |
-              xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+      - run: bundle install
       - run:
           name: Generate xcode project for code coverage
           command: |
-              swift package generate-xcodeproj
+              swift package generate-xcodeproj --enable-code-coverage         
+      - run:
+          name: Run Tests
+          command: |
+              xcodebuild -scheme Config-Package test |
+              xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
       - run:
           name: Post Coverage
           command: bundle exec slather              
