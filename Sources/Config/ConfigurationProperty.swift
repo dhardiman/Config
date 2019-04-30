@@ -54,11 +54,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
                 .flatMap { $0 as? [String: Any] }?
                 .mapValues { try ConfigurationProperty.transformValueToType(value: $0) }
 
-            if let overrides = overrides {
-                self.overrides = overrides
-            } else {
-                self.overrides = [:]
-            }
+            self.overrides = overrides ?? [:]
         } catch {
             return nil
         }
