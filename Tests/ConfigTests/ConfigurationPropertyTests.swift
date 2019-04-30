@@ -239,7 +239,7 @@ class ConfigurationPropertyTests: XCTestCase {
         let property = ConfigurationProperty<String?>(key: "test", typeHint: "String?", dict: [
             "defaultValue": NSNull.self
         ])
-        let expectedValue = ##"    static let test: String? = nil"##
+        let expectedValue = "    static let test: String? = nil"
         let actualValue = try whenTheDeclarationIsWritten(for: property)
         expect(actualValue).to(equal(expectedValue))
     }
