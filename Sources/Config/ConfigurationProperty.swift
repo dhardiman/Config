@@ -9,6 +9,9 @@
 import Foundation
 
 struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
+    private enum Failure: Error {
+        case notConvertible
+    }
 
     let key: String
     let description: String?
@@ -26,21 +29,39 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         }
     }
 
+    private static func transformValueToType(value: Any?) throws -> T {
+        if let val = value as? T {
+            return val
+        }
+        if let nilLiteralType = T.self as? ExpressibleByNilLiteral.Type {
+            return nilLiteralType.init(nilLiteral: ()) as! T
+        }
+
+        throw Failure.notConvertible
+    }
+
     init?(key: String, typeHint: String, dict: [String: Any]) {
-        guard let defaultValue = dict["defaultValue"] as? T else {
+        do {
+            self.defaultValue = try ConfigurationProperty.transformValueToType(value: dict["defaultValue"])
+            
+            self.key = key
+            self.typeHint = typeHint
+            self.associatedProperty = dict["associatedProperty"] as? String
+            self.type = PropertyType(rawValue: typeHint)
+            self.description = dict["description"] as? String
+
+            let overrides = try? dict["overrides"]
+                .flatMap { $0 as? [String: Any] }?
+                .mapValues { try ConfigurationProperty.transformValueToType(value: $0) }
+
+            if let overrides = overrides {
+                self.overrides = overrides
+            } else {
+                self.overrides = [:]
+            }
+        } catch {
             return nil
         }
-        self.key = key
-        self.typeHint = typeHint
-        self.associatedProperty = dict["associatedProperty"] as? String
-        self.type = PropertyType(rawValue: typeHint)
-        self.defaultValue = defaultValue
-        if let overrides = dict["overrides"] as? [String: T] {
-            self.overrides = overrides
-        } else {
-            self.overrides = [:]
-        }
-        self.description = dict["description"] as? String
     }
 
     func value(for scheme: String) -> T {
