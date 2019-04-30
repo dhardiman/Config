@@ -29,6 +29,17 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         }
     }
 
+    /// Returns `value` as the `ConfigurationProperty`'s value type (T).
+    /// If T is Optional<Something> and conversion of `value` fails,
+    /// rather than throwing an exception and bailing out this method
+    /// will return `Optional.none` using `ExpressibleByNilLiteral`'s
+    /// init(nilLiteral:), allowing a `ConfigurationProperty` with a nil
+    /// value.
+    ///
+    /// - Parameter value: The value to transform.
+    /// - Returns: The value as T, if possible.
+    /// - Throws: If the value is not convertible to T, Failure.notConvertible
+    ///   will be thrown.
     private static func transformValueToType(value: Any?) throws -> T {
         if let val = value as? T {
             return val
