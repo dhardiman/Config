@@ -53,6 +53,7 @@ func byteArrayOutput(from: [UInt8]) -> String {
 
 enum PropertyType: String {
     case string = "String"
+    case optionalString = "String?"
     case url = "URL"
     case encrypted = "Encrypted"
     case encryptionKey = "EncryptionKey"
@@ -85,15 +86,19 @@ enum PropertyType: String {
     }
 
     func valueDeclaration(for value: Any, iv: IV, key: String?) -> String {
-        let stringValue = { () -> String in
-            if let string = value as? String, string.isEmpty {
-                return "\"\""
+        let stringValueAllowingOptional = { (optional: Bool) -> String in
+            if let string = value as? String {
+                return string.isEmpty ? "\"\"" : "#\"\(string)\"#"
+            } else if optional {
+                return "nil"
             }
             return "#\"\(value)\"#"
         }
         switch self {
         case .string:
-            return stringValue()
+            return stringValueAllowingOptional(false)
+        case .optionalString:
+            return stringValueAllowingOptional(true)
         case .url:
             return #"URL(string: "\#(value)")!"#
         case .encryptionKey:
@@ -113,7 +118,7 @@ enum PropertyType: String {
         case .bool:
             return "\(value as! Bool)"
         case .regex:
-            return "try! NSRegularExpression(pattern: \(stringValue()), options: [])"
+            return "try! NSRegularExpression(pattern: \(stringValueAllowingOptional(false)), options: [])"
         default:
             return "\(value)"
         }

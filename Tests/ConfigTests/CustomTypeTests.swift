@@ -62,6 +62,12 @@ class CustomTypeTests: XCTestCase {
         expect(type?.placeholders.last?.name).to(equal("secondplaceholder"))
         expect(type?.placeholders.last?.type).to(equal(.bool))
     }
+
+    func testItCanParsePlaceholdersWithAnOptionalStringAsATypeAttribute() {
+        let type = CustomType(source: givenATypeDictionaryWithTypeAnnotations(firstPlaceholderType: "String?"))
+        expect(type?.placeholders.first?.name).to(equal("firstplaceholder"))
+        expect(type?.placeholders.first?.type).to(equal(.optionalString))
+    }
 }
 
 func givenATypeDictionary() -> [String: Any] {
@@ -71,9 +77,9 @@ func givenATypeDictionary() -> [String: Any] {
     ]
 }
 
-func givenATypeDictionaryWithTypeAnnotations() -> [String: Any] {
+func givenATypeDictionaryWithTypeAnnotations(firstPlaceholderType: String = "String", secondPlaceholderType: String = "Bool") -> [String: Any] {
     return [
         "typeName": "CustomType",
-        "initialiser": "CustomType(oneThing: {firstplaceholder:String}, secondThing: {secondplaceholder:Bool})"
+        "initialiser": "CustomType(oneThing: {firstplaceholder:\(firstPlaceholderType)}, secondThing: {secondplaceholder:\(secondPlaceholderType)})"
     ]
 }

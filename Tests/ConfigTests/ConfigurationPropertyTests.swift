@@ -229,9 +229,39 @@ class ConfigurationPropertyTests: XCTestCase {
     func testItCanWriteARegexProperty() throws {
         let imageProperty = ConfigurationProperty<String>(key: "test", typeHint: "Regex", dict: [
             "defaultValue": "an\\sexpression",
-            ])
+        ])
         let expectedValue = ##"    static let test: NSRegularExpression = try! NSRegularExpression(pattern: #"an\sexpression"#, options: [])"##
         let actualValue = try whenTheDeclarationIsWritten(for: imageProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnOptionalStringProperty() throws {
+        let property = ConfigurationProperty<String?>(key: "test", typeHint: "String?", dict: [
+            "defaultValue": NSNull.self
+        ])
+        let expectedValue = "    static let test: String? = nil"
+        let actualValue = try whenTheDeclarationIsWritten(for: property)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnOptionalOverrideStringProperty() throws {
+        let property = ConfigurationProperty<String?>(key: "test", typeHint: "String?", dict: [
+            "defaultValue": "Test",
+            "overrides": [
+                "bla": NSNull.self
+            ]
+        ])
+        let expectedValue = "    static let test: String? = nil"
+        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "bla")
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnOptionalStringPropertyWithAValue() throws {
+        let property = ConfigurationProperty<String?>(key: "test", typeHint: "String?", dict: [
+            "defaultValue": "Test"
+        ])
+        let expectedValue = ##"    static let test: String? = #"Test"#"##
+        let actualValue = try whenTheDeclarationIsWritten(for: property)
         expect(actualValue).to(equal(expectedValue))
     }
 }
