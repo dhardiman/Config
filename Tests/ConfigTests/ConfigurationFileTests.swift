@@ -256,6 +256,10 @@ class ConfigurationFileTests: XCTestCase {
 
             public static let float: Float = 0.0
 
+            public static let optionalInt: Int? = nil
+
+            public static let optionalString: String? = nil
+
             public static let schemeName: String = #"any"#
 
             public static let stringArray: [String] = []
@@ -422,6 +426,14 @@ private let configurationWithDifferentTypes: [String: Any] = [
     "stringArray": [
         "type": "[String]",
         "defaultValue": []
+    ],
+    "optionalString": [
+        "type": "String?",
+        "defaultValue": nil
+    ],
+    "optionalInt": [
+        "type": "Int?",
+        "defaultValue": nil
     ]
 ]
 

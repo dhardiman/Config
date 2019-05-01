@@ -58,6 +58,7 @@ enum PropertyType: String {
     case encrypted = "Encrypted"
     case encryptionKey = "EncryptionKey"
     case int = "Int"
+    case optionalInt = "Int?"
     case double = "Double"
     case float = "Float"
     case dictionary = "Dictionary"
@@ -119,6 +120,12 @@ enum PropertyType: String {
             return "\(value as! Bool)"
         case .regex:
             return "try! NSRegularExpression(pattern: \(stringValueAllowingOptional(false)), options: [])"
+        case .optionalInt:
+            if let int = value as? Int {
+                return "\(int)"
+            } else {
+                fallthrough
+            }
         default:
             return "\(value)"
         }

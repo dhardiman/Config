@@ -264,4 +264,34 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: property)
         expect(actualValue).to(equal(expectedValue))
     }
+
+    func testItCanWriteAnOptionalIntProperty() throws {
+        let property = ConfigurationProperty<Int?>(key: "test", typeHint: "Int?", dict: [
+            "defaultValue": NSNull.self
+        ])
+        let expectedValue = "    static let test: Int? = nil"
+        let actualValue = try whenTheDeclarationIsWritten(for: property)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnOptionalOverrideIntProperty() throws {
+        let property = ConfigurationProperty<Int?>(key: "test", typeHint: "Int?", dict: [
+            "defaultValue": 3,
+            "overrides": [
+                "bla": NSNull.self
+            ]
+        ])
+        let expectedValue = "    static let test: Int? = nil"
+        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "bla")
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnOptionalIntPropertyWithAValue() throws {
+        let property = ConfigurationProperty<Int?>(key: "test", typeHint: "Int?", dict: [
+            "defaultValue": 7
+        ])
+        let expectedValue = "    static let test: Int? = 7"
+        let actualValue = try whenTheDeclarationIsWritten(for: property)
+        expect(actualValue).to(equal(expectedValue))
+    }
 }

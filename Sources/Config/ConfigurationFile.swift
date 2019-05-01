@@ -108,6 +108,8 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
             copy[pair.key] = ConfigurationProperty<Double>(key: pair.key, typeHint: typeHintValue, dict: dict)
         case .int:
             copy[pair.key] = ConfigurationProperty<Int>(key: pair.key, typeHint: typeHintValue, dict: dict)
+        case .optionalInt:
+            copy[pair.key] = ConfigurationProperty<Int?>(key: pair.key, typeHint: typeHintValue, dict: dict)
         case .dictionary:
             copy[pair.key] = ConfigurationProperty<[String: Any]>(key: pair.key, typeHint: typeHintValue, dict: dict)
         case .bool:
