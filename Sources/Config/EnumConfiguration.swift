@@ -44,7 +44,7 @@ struct EnumConfiguration: Template {
             var copy = properties
             switch type {
             case "String":
-                copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: "", dict: dict)
+                copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: "", dict: dict, patterns: OverridePattern.patterns(from: template))
             default: throw EnumError.unknownType
             }
             return copy

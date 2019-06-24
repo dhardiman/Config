@@ -20,6 +20,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
     let defaultValue: T
     let associatedProperty: String?
     let overrides: [String: T]
+    let patterns: [OverridePattern]
 
     var typeName: String {
         if let type = type {
@@ -51,7 +52,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         throw Failure.notConvertible
     }
 
-    init?(key: String, typeHint: String, dict: [String: Any]) {
+    init?(key: String, typeHint: String, dict: [String: Any], patterns: [OverridePattern] = []) {
         do {
             self.defaultValue = try ConfigurationProperty.transformValueToType(value: dict["defaultValue"])
             
@@ -60,6 +61,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
             self.associatedProperty = dict["associatedProperty"] as? String
             self.type = PropertyType(rawValue: typeHint)
             self.description = dict["description"] as? String
+            self.patterns = patterns
 
             let overrides = try? dict["overrides"]
                 .flatMap { $0 as? [String: Any] }?
@@ -71,12 +73,20 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         }
     }
 
+    private func pattern(for override: String) -> String {
+        guard let pattern = patterns.first(where: { $0.alias == override }) else {
+            return override
+        }
+        return pattern.pattern
+    }
+
     func value(for scheme: String) -> T {
+
         if let override = overrides.first(where: { item in
             if associatedProperty != nil {
                 return item.key == scheme
             }
-            return scheme.range(of: item.key, options: .regularExpression) != nil
+            return scheme.range(of: pattern(for: item.key), options: .regularExpression) != nil
         }) {
             return override.value
         }

@@ -26,12 +26,12 @@ struct Configuration {
     let properties: [String: Property]
     let childConfigurations: [String: Configuration]
 
-    init(config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?) {
+    init(config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?, commonPatterns: [OverridePattern]) {
         properties = config.reduce([String: Property]()) { properties, pair in
-            return parseNextProperty(properties: properties, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
+            return parseNextProperty(properties: properties, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType, patterns: commonPatterns)
         }
         childConfigurations = config.reduce([String: Configuration]()) { configurations, pair in
-            return parseNextConfiguration(configurations: configurations, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
+            return parseNextConfiguration(configurations: configurations, pair: pair, config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType, patterns: commonPatterns)
         }
     }
 
@@ -90,7 +90,7 @@ extension String {
     }
 }
 
-func parseNextProperty(properties: [String: Property], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?) -> [String: Property] {
+func parseNextProperty(properties: [String: Property], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?, patterns: [OverridePattern]) -> [String: Property] {
     guard let dict = pair.value as? [String: Any] else {
         return properties
     }
@@ -101,21 +101,21 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
     if let typeHint = PropertyType(rawValue: typeHintValue) {
         switch typeHint {
         case .string, .url, .encrypted, .encryptionKey, .colour, .image, .regex:
-            copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .optionalString:
-            copy[pair.key] = ConfigurationProperty<String?>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<String?>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .double, .float:
-            copy[pair.key] = ConfigurationProperty<Double>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<Double>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .int:
-            copy[pair.key] = ConfigurationProperty<Int>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<Int>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .optionalInt:
-            copy[pair.key] = ConfigurationProperty<Int?>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<Int?>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .dictionary:
-            copy[pair.key] = ConfigurationProperty<[String: Any]>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<[String: Any]>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .bool:
-            copy[pair.key] = ConfigurationProperty<Bool>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<Bool>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .stringArray:
-            copy[pair.key] = ConfigurationProperty<[String]>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<[String]>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         case .reference:
             guard let referenceType = referenceTypeHint(for: dict, in: config, referenceSource: referenceSource) else {
                 return properties
@@ -129,7 +129,7 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
             copy[pair.key] = CustomPropertyArray(key: pair.key, customType: customType, dict: dict)
         }
         else {
-            copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict)
+            copy[pair.key] = ConfigurationProperty<String>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         }
     }
     return copy
@@ -153,12 +153,12 @@ private func referenceDict(for key: String, from config: [String: Any], or refer
     return referenceSource?[key] as? [String: Any]
 }
 
-func parseNextConfiguration(configurations: [String: Configuration], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?) -> [String: Configuration] {
+func parseNextConfiguration(configurations: [String: Configuration], pair: (key: String, value: Any), config: [String: Any], referenceSource: [String: Any]?, customTypes: [CustomType], defaultType: PropertyType?, patterns: [OverridePattern]) -> [String: Configuration] {
     guard let dict = pair.value as? [String: Any], dict["defaultValue"] == nil, pair.key != "template" else {
         return configurations
     }
     var copy = configurations
-    copy[pair.key] = Configuration(config: dict, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
+    copy[pair.key] = Configuration(config: dict, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType, commonPatterns: patterns)
     return copy
 }
 
@@ -177,6 +177,8 @@ struct ConfigurationFile: Template {
 
     let customTypes: [CustomType]
 
+    let commonPatterns: [OverridePattern]
+
     let defaultType: PropertyType?
 
     init(config: [String: Any], name: String, scheme: String, source: URL) throws {
@@ -188,6 +190,7 @@ struct ConfigurationFile: Template {
         self.imports = ["Foundation"] + ((self.template?["imports"] as? [String]) ?? [])
 
         self.customTypes = CustomType.typeArray(from: self.template)
+        self.commonPatterns = OverridePattern.patterns(from: self.template)
 
         if let defaultType = template?["defaultType"] as? String {
             self.defaultType = PropertyType(rawValue: defaultType)
@@ -203,7 +206,7 @@ struct ConfigurationFile: Template {
 
         iv = try IV(dict: config)
 
-        let root = Configuration(config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType)
+        let root = Configuration(config: config, referenceSource: referenceSource, customTypes: customTypes, defaultType: defaultType, commonPatterns: commonPatterns)
         var parsedProperties = root.properties
 
         encryptionKey = parsedProperties.values.compactMap { $0 as? ConfigurationProperty<String> }
@@ -211,7 +214,7 @@ struct ConfigurationFile: Template {
         if encryptionKey != nil {
             parsedProperties[iv.key] = iv
         }
-        if template?["extensionOn"] == nil, let schemeProperty = ConfigurationProperty<String>(key: "schemeName", typeHint: "String", dict: ["defaultValue": scheme]) {
+        if template?["extensionOn"] == nil, let schemeProperty = ConfigurationProperty<String>(key: "schemeName", typeHint: "String", dict: ["defaultValue": scheme], patterns: commonPatterns) {
             parsedProperties[schemeProperty.key] = schemeProperty
         }
         rootConfiguration = Configuration(properties: parsedProperties, childConfigurations: root.childConfigurations)

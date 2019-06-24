@@ -294,4 +294,17 @@ class ConfigurationPropertyTests: XCTestCase {
         let actualValue = try whenTheDeclarationIsWritten(for: property)
         expect(actualValue).to(equal(expectedValue))
     }
+
+    func testItCanUseCommonPatternsForOverrides() throws {
+        let dict: [String: Any] = [
+            "defaultValue": "test value",
+            "overrides": [
+                "barry": "pattern value"
+            ]
+        ]
+        let property = ConfigurationProperty<String>(key: "test", typeHint: "String", dict: dict, patterns: [OverridePattern(source: ["alias": "barry", "pattern": "gary"])!])
+        let expectedValue = ##"    static let test: String = #"pattern value"#"##
+        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "gary")
+        expect(actualValue).to(equal(expectedValue))
+    }
 }
