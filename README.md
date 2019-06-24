@@ -201,6 +201,29 @@ It is possible to use your own custom types with config. Add a `customTypes` arr
 
 Placeholders in the initialiser template should be written as `{key}` or `{key:TypeHint}` where the type hint is one of the basic primitive types, `Bool`, `String`, `URL`, `Int`, `Double`. If no type hint is supplied then the value is treated as an expression.
 
+### Common patterns
+If you find yourself repeating override patterns, for example `(PROD|STAGING)` you can list those in the `patterns` section of the template for reuse in your configuration. For example:
+
+```
+{
+  "template": {
+    "patterns": [
+      {
+        "alias": "prodAndStaging",
+        "pattern": "(PROD|STAGING)"
+      }
+    ]
+  },
+  "myString": {
+    "type": "String",
+    "defaultValue": "Hello",
+    "overrides": {
+      "prodAndStaging": "Overridden value"
+    }
+  }
+}
+```
+
 ## Writing your own schemas
 Just add a new class or struct to the project and implement `Template`. Add your new parser to the `templates` array in main.swift. Your template should inspect a `template` dictionary in any config and decide whether it can parse it. Either using a `name` item, or through other means. Ensure `ConfigurationFile` is the last item in that array. As the default schema parser it claims to be able to parse all files.
 
