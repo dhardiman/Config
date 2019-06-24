@@ -313,6 +313,28 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItCanUsePatternsForMatchingOverrides() throws {
+        let config = try ConfigurationFile(config: configurationWithCommonPatterns, name: "Test", scheme: "PROD", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from PROD */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public enum Test {
+            public static let propertyNotUsingPattern: String = #"test value"#
+
+            public static let propertyUsingPattern: String = #"test value"#
+
+            public static let schemeName: String = #"PROD"#
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -468,5 +490,30 @@ private let configurationWithDefaultType: [String: Any] = [
     ],
     "property": [
         "defaultValue": "test value"
+    ]
+]
+
+private let configurationWithCommonPatterns: [String: Any] = [
+    "template": [
+        "patterns": [
+            [
+                "alias": "prodAndStaging",
+                "pattern": "(PROD|STAGING)"
+            ]
+        ]
+    ],
+    "propertyUsingPattern": [
+        "type": "String",
+        "defaultValue": "Oops",
+        "overrides": [
+            "prodAndStaging": "test value"
+        ]
+    ],
+    "propertyNotUsingPattern": [
+        "type": "String",
+        "defaultValue": "Oops",
+        "overrides": [
+            "(PROD|STAGING)": "test value"
+        ]
     ]
 ]
