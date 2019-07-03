@@ -120,7 +120,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
     }
 
     func keyValue(for scheme: String) -> String {
-        let overrideValue = overrides.first(where: { scheme.range(of: $0.key, options: .regularExpression) != nil })?.value ?? defaultValue
+        let overrideValue = overrides.first(where: { scheme.range(of: pattern(for: $0.key), options: .regularExpression) != nil })?.value ?? defaultValue
         guard let value = overrideValue as? String else {
             fatalError("Cannot retrieve keyValue for type \(T.self). Type must be String.")
         }

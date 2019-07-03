@@ -322,6 +322,8 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
+            public static let associatedProperty: String = #"correct"#
+
             public static let propertyNotUsingPattern: String = #"test value"#
 
             public static let propertyUsingPattern: String = #"test value"#
@@ -514,6 +516,14 @@ private let configurationWithCommonPatterns: [String: Any] = [
         "defaultValue": "Oops",
         "overrides": [
             "(PROD|STAGING)": "test value"
+        ]
+    ],
+    "associatedProperty": [
+        "type": "String",
+        "associatedProperty": "propertyUsingPattern",
+        "defaultValue": "wrong",
+        "overrides": [
+            "test value": "correct"
         ]
     ]
 ]
