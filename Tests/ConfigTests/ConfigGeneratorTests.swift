@@ -65,7 +65,7 @@ class ConfigGeneratorTests: XCTestCase {
         return [
             "",
             "--configPath", tempURL.path,
-            "--scheme", "any",
+            "--name", "any",
             "--ext", "ext"
         ]
     }
@@ -111,9 +111,9 @@ private let expectedStrings = [
 
     // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
     public enum standard {
-        public static let float: Float = 0.0
+        public static let configName: String = #"any"#
 
-        public static let schemeName: String = #"any"#
+        public static let float: Float = 0.0
     }
 
     // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command

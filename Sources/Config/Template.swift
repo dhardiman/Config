@@ -9,7 +9,7 @@
 import Foundation
 
 protocol Template: CustomStringConvertible {
-    init(config: [String: Any], name: String, scheme: String, source: URL) throws
+    init(config: [String: Any], name: String, configName: String, source: URL) throws
 
     static func canHandle(config: [String: Any]) -> Bool
 

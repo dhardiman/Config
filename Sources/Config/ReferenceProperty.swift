@@ -30,16 +30,16 @@ struct ReferenceProperty: Property {
         self.description = dict["description"] as? String
     }
 
-    func value(for scheme: String) -> String {
+    func value(for configName: String) -> String {
         if let override = overrides.first(where: { item in
-            return scheme.range(of: item.key, options: .regularExpression) != nil
+            return configName.range(of: item.key, options: .regularExpression) != nil
         }) {
             return override.value
         }
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for configName: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
@@ -47,11 +47,11 @@ struct ReferenceProperty: Property {
         if requiresNonObjCDeclarations {
             template += """
             \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") static var \(key): \(typeName) {
-            \(String.indent(for: indentWidth + 1))return \(value(for: scheme))
+            \(String.indent(for: indentWidth + 1))return \(value(for: configName))
             \(String.indent(for: indentWidth))}
             """
         } else {
-            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let \(key): \(typeName) = \(value(for: scheme))"
+            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let \(key): \(typeName) = \(value(for: configName))"
         }
         return template
     }

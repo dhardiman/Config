@@ -55,21 +55,21 @@ struct CustomProperty: Property {
         return customType.typeName
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for configName: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
         return template(for: description, isPublic: isPublic, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
-            .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
+            .replacingOccurrences(of: "{value}", with: outputValue(for: configName, type: customType))
     }
 
-    private func outputValue(for scheme: String, type: CustomType) -> String {
+    private func outputValue(for configName: String, type: CustomType) -> String {
         let value: Any
-        if let override = overrides[scheme] {
+        if let override = overrides[configName] {
             value = override
         } else {
             value = defaultValue
         }
         let template = CustomPropertyValue(value: value)
-        return template.outputValue(for: scheme, type: type)
+        return template.outputValue(for: configName, type: type)
     }
 }
 
@@ -94,20 +94,20 @@ struct CustomPropertyArray: Property {
         return "[\(customType.typeName)]"
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for configName: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
         return template(for: description, isPublic: isPublic, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
-            .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
+            .replacingOccurrences(of: "{value}", with: outputValue(for: configName, type: customType))
     }
 
-    private func outputValue(for scheme: String, type: CustomType) -> String {
+    private func outputValue(for configName: String, type: CustomType) -> String {
         let value: [Any]
-        if let override = overrides.first(where: { scheme.range(of: $0.key, options: .regularExpression) != nil }) {
+        if let override = overrides.first(where: { configName.range(of: $0.key, options: .regularExpression) != nil }) {
             value = override.value
         } else {
             value = defaultValue
         }
-        return "[" + value.map { CustomPropertyValue(value: $0).outputValue(for: scheme, type: type) }
+        return "[" + value.map { CustomPropertyValue(value: $0).outputValue(for: configName, type: type) }
             .joined(separator: ", ") + "]"
     }
 }
@@ -143,7 +143,7 @@ private func template(for description: String?, isPublic: Bool, indentWidth: Int
 private struct CustomPropertyValue {
     let value: Any
 
-    func outputValue(for scheme: String, type: CustomType) -> String {
+    func outputValue(for configName: String, type: CustomType) -> String {
         switch type.placeholders.count {
         case 0:
             return type.initialiser

@@ -22,10 +22,10 @@ class ConfigurationPropertyTests: XCTestCase {
         ])
     }
 
-    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
+    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, configName: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
         let iv = try IV(dict: ["initialise": "me"])
         print("\(iv.hash)")
-        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
+        return configurationProperty?.propertyDeclaration(for: configName, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -38,7 +38,7 @@ class ConfigurationPropertyTests: XCTestCase {
     func testItCanWriteADeclarationForAnEmptyStringProperty() throws {
         let stringProperty = givenAStringProperty()
         let expectedValue = ##"    static let test: String = """##
-        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, scheme: "empty")
+        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, configName: "empty")
         expect(actualValue).to(equal(expectedValue))
     }
 
@@ -70,14 +70,14 @@ class ConfigurationPropertyTests: XCTestCase {
     func testItCanGetAnOverrideForAnExactMatch() throws {
         let stringProperty = givenAStringProperty()
         let expectedValue = ##"    static let test: String = #"hello value"#"##
-        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, scheme: "hello")
+        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, configName: "hello")
         expect(actualValue).to(equal(expectedValue))
     }
 
     func testItCanGetAnOverrideForAPatternMatch() throws {
         let stringProperty = givenAStringProperty()
         let expectedValue = ##"    static let test: String = #"pattern value"#"##
-        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, scheme: "match-a-pattern")
+        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, configName: "match-a-pattern")
         expect(actualValue).to(equal(expectedValue))
     }
 
@@ -252,7 +252,7 @@ class ConfigurationPropertyTests: XCTestCase {
             ]
         ])
         let expectedValue = "    static let test: String? = nil"
-        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "bla")
+        let actualValue = try whenTheDeclarationIsWritten(for: property, configName: "bla")
         expect(actualValue).to(equal(expectedValue))
     }
 
@@ -282,7 +282,7 @@ class ConfigurationPropertyTests: XCTestCase {
             ]
         ])
         let expectedValue = "    static let test: Int? = nil"
-        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "bla")
+        let actualValue = try whenTheDeclarationIsWritten(for: property, configName: "bla")
         expect(actualValue).to(equal(expectedValue))
     }
 
@@ -304,7 +304,7 @@ class ConfigurationPropertyTests: XCTestCase {
         ]
         let property = ConfigurationProperty<String>(key: "test", typeHint: "String", dict: dict, patterns: [OverridePattern(source: ["alias": "barry", "pattern": "gary"])!])
         let expectedValue = ##"    static let test: String = #"pattern value"#"##
-        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "gary")
+        let actualValue = try whenTheDeclarationIsWritten(for: property, configName: "gary")
         expect(actualValue).to(equal(expectedValue))
     }
 }

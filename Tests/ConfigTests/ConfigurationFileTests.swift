@@ -16,9 +16,9 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItCanBeInitialisedFromAnEmptyConfiguration() throws {
-        let config = try ConfigurationFile(config: givenAConfigDictionary(), name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: givenAConfigDictionary(), name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         expect(config.name).to(equal("Test"))
-        expect(config.scheme).to(equal("any"))
+        expect(config.configName).to(equal("any"))
         let testIV = try IV(dict: [:])
         expect(config.iv.hash).to(equal(testIV.hash))
         expect(config.filename).to(beNil())
@@ -29,7 +29,7 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let schemeName: String = #"any"#
+            public static let configName: String = #"any"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -40,7 +40,7 @@ class ConfigurationFileTests: XCTestCase {
 
     func testItCanOutputAnExtension() throws {
         let dict = givenAConfigDictionary(withTemplate: extensionTemplate)
-        let config = try ConfigurationFile(config: dict, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: dict, name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let testIV = try IV(dict: dict)
         expect(config.iv.hash).to(equal(testIV.hash))
         expect(config.filename).to(equal("UIColor+Test"))
@@ -62,7 +62,7 @@ class ConfigurationFileTests: XCTestCase {
 
     func testItCanOutputAdditionalImports() throws {
         let dict = givenAConfigDictionary(withTemplate: importsTemplate)
-        let config = try ConfigurationFile(config: dict, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: dict, name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from any */
 
@@ -72,7 +72,7 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let schemeName: String = #"any"#
+            public static let configName: String = #"any"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -82,7 +82,7 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItCanOutputEncryptedValues() throws {
-        let config = try ConfigurationFile(config: configWithEncryption, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configWithEncryption, name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from any */
 
@@ -90,11 +90,11 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
+            public static let configName: String = #"any"#
+
             public static let encryptionKey: [UInt8] = [UInt8(116), UInt8(104), UInt8(101), UInt8(45), UInt8(107), UInt8(101), UInt8(121), UInt8(45), UInt8(116), UInt8(111), UInt8(45), UInt8(116), UInt8(104), UInt8(101), UInt8(45), UInt8(115), UInt8(101), UInt8(99), UInt8(114), UInt8(101), UInt8(116)]
 
             public static let encryptionKeyIV: [UInt8] = [UInt8(97), UInt8(53), UInt8(101), UInt8(49), UInt8(49), UInt8(97), UInt8(100), UInt8(57), UInt8(98), UInt8(53), UInt8(56), UInt8(55), UInt8(52), UInt8(56), UInt8(101), UInt8(48), UInt8(52), UInt8(56), UInt8(57), UInt8(57), UInt8(56), UInt8(97), UInt8(102), UInt8(53), UInt8(55), UInt8(55), UInt8(97), UInt8(55), UInt8(98), UInt8(97), UInt8(48), UInt8(102)]
-
-            public static let schemeName: String = #"any"#
 
             public static let somethingSecret: [UInt8] = [UInt8(72), UInt8(248), UInt8(24), UInt8(73), UInt8(30), UInt8(207), UInt8(159), UInt8(0), UInt8(65), UInt8(147), UInt8(20), UInt8(183), UInt8(214), UInt8(231), UInt8(169), UInt8(3)]
         }
@@ -106,9 +106,9 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItUsesOverridesAndOrdersProperties() throws {
-        let config = try ConfigurationFile(config: configWithOverride, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configWithOverride, name: "Test", configName: "name", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        /* Test.swift auto-generated from name */
 
         import Foundation
 
@@ -116,7 +116,7 @@ class ConfigurationFileTests: XCTestCase {
         public enum Test {
             public static let anotherProperty: Int = 1
 
-            public static let schemeName: String = #"scheme"#
+            public static let configName: String = #"name"#
 
             public static let testProperty: String = #"A test"#
         }
@@ -128,19 +128,19 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItItCanWriteReferenceProperties() throws {
-        let config = try ConfigurationFile(config: configWithReferenceProperty, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configWithReferenceProperty, name: "Test", configName: "name", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        /* Test.swift auto-generated from name */
 
         import Foundation
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
+            public static let configName: String = #"name"#
+
             public static let property: String = #"A test"#
 
             public static let referenceProperty: String = property
-
-            public static let schemeName: String = #"scheme"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -150,7 +150,7 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItCanWriteNonObjcProperties() throws {
-        let config = try ConfigurationFile(config: givenAConfigDictionary(withTemplate: nonObjCTemplate), name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: givenAConfigDictionary(withTemplate: nonObjCTemplate), name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from any */
 
@@ -158,7 +158,7 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            @nonobjc public static var schemeName: String {
+            @nonobjc public static var configName: String {
                 return #"any"#
             }
         }
@@ -170,15 +170,15 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItOutputsGroups() throws {
-        let config = try ConfigurationFile(config: groupedConfig, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: groupedConfig, name: "Test", configName: "name", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        /* Test.swift auto-generated from name */
 
         import Foundation
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let schemeName: String = #"scheme"#
+            public static let configName: String = #"name"#
 
             public enum FirstGroup {
                 public static let testProperty: String = #"A test"#
@@ -196,9 +196,9 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testAssociatedPropertiesAreOutputForDefaults() throws {
-        let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", configName: "name", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        /* Test.swift auto-generated from name */
 
         import Foundation
 
@@ -207,9 +207,9 @@ class ConfigurationFileTests: XCTestCase {
             /// API Host
             public static let host: String = #"dev.dave.com"#
 
-            public static let hostKey: String = #"a-secret-key"#
+            public static let configName: String = #"name"#
 
-            public static let schemeName: String = #"scheme"#
+            public static let hostKey: String = #"a-secret-key"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -218,8 +218,8 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
-    func testAssociatedPropertiesAreOutputForScheme() throws {
-        let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", scheme: "prod", source: URL(fileURLWithPath: "/"))
+    func testAssociatedPropertiesAreOutputForConfiguration() throws {
+        let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", configName: "prod", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from prod */
 
@@ -230,9 +230,9 @@ class ConfigurationFileTests: XCTestCase {
             /// API Host
             public static let host: String = #"dave.com"#
 
-            public static let hostKey: String = #"the-prod-key"#
+            public static let configName: String = #"prod"#
 
-            public static let schemeName: String = #"prod"#
+            public static let hostKey: String = #"the-prod-key"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -242,7 +242,7 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testPropertiesAreOutputForVariousTypes() throws {
-        let config = try ConfigurationFile(config: configurationWithDifferentTypes, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configurationWithDifferentTypes, name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from any */
 
@@ -252,6 +252,8 @@ class ConfigurationFileTests: XCTestCase {
         public enum Test {
             public static let bool: Bool = true
 
+            public static let configName: String = #"any"#
+
             public static let dictionary: [String: Any] = ["bool": true, "dict": [:], "key": 12]
 
             public static let float: Float = 0.0
@@ -259,8 +261,6 @@ class ConfigurationFileTests: XCTestCase {
             public static let optionalInt: Int? = nil
 
             public static let optionalString: String? = nil
-
-            public static let schemeName: String = #"any"#
 
             public static let stringArray: [String] = []
         }
@@ -272,7 +272,7 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testPropertiesAreOutputForCustomTypes() throws {
-        let config = try ConfigurationFile(config: configurationWithCustomType, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configurationWithCustomType, name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from any */
 
@@ -282,9 +282,9 @@ class ConfigurationFileTests: XCTestCase {
         public enum Test {
             public static let arrayProperty: [CustomType] = [CustomType(param: #"Value"#)]
 
-            public static let property: CustomType = CustomType(param: #"Value"#)
+            public static let configName: String = #"any"#
 
-            public static let schemeName: String = #"any"#
+            public static let property: CustomType = CustomType(param: #"Value"#)
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -294,7 +294,7 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItUsesADefaultTypeIfOneIsNotSpecified() throws {
-        let config = try ConfigurationFile(config: configurationWithDefaultType, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configurationWithDefaultType, name: "Test", configName: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from any */
 
@@ -302,9 +302,9 @@ class ConfigurationFileTests: XCTestCase {
 
         // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
         public enum Test {
-            public static let property: String = #"test value"#
+            public static let configName: String = #"any"#
 
-            public static let schemeName: String = #"any"#
+            public static let property: String = #"test value"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -314,7 +314,7 @@ class ConfigurationFileTests: XCTestCase {
     }
 
     func testItCanUsePatternsForMatchingOverrides() throws {
-        let config = try ConfigurationFile(config: configurationWithCommonPatterns, name: "Test", scheme: "PROD", source: URL(fileURLWithPath: "/"))
+        let config = try ConfigurationFile(config: configurationWithCommonPatterns, name: "Test", configName: "PROD", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
         /* Test.swift auto-generated from PROD */
 
@@ -324,11 +324,11 @@ class ConfigurationFileTests: XCTestCase {
         public enum Test {
             public static let associatedProperty: String = #"correct"#
 
+            public static let configName: String = #"PROD"#
+
             public static let propertyNotUsingPattern: String = #"test value"#
 
             public static let propertyUsingPattern: String = #"test value"#
-
-            public static let schemeName: String = #"PROD"#
         }
 
         // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
@@ -376,7 +376,7 @@ private let configWithOverride: [String: Any] = [
         "type": "Int",
         "defaultValue": 0,
         "overrides": [
-            "scheme": 1
+            "name": 1
         ]
     ]
 ]

@@ -7,9 +7,9 @@ This is a command line tool for generating configuration files from a custom JSO
 Because each configuration requires a completely separate input file, it doesn't allow for sharing values across configurations, and it also makes it too easy to forget to add values across every configuration.
 
 ### How to use
-Simply pass a folder and a scheme name to the command:
+Simply pass a folder and a configuration name to the command:
 ```
-generateconfig --configPath /path/to/my/config --scheme my-scheme-name
+generateconfig --configPath /path/to/my/config --name my-config-name
 ```
 
 `generateconfig` will find all files with a `.config` file extension, search for a suitable template, and output a .swift file for each file.
@@ -26,19 +26,19 @@ A sample of the schema is:
   "key": {
     "description": "An optional comment to document the property. Will be added as a comment to the generated code",
     "type": "String",
-    "defaultValue": "value to be used by all schemes",
+    "defaultValue": "value to be used by all configurations",
     "overrides": {
-      "scheme pattern 1": "a different string to be used by schemes matching 'scheme pattern 1'",
-      "scheme pattern 2": "a different string to be used by schemes matching 'scheme pattern 2'"   
+      "config pattern 1": "a different string to be used by configurations matching 'config pattern 1'",
+      "config pattern 2": "a different string to be used by configurations matching 'config pattern 2'"
     }
   },
   "group: {
     "key": {
       "type": "String",
-      "defaultValue": "value to be used by all schemes",
+      "defaultValue": "value to be used by all configurations",
       "overrides": {
-        "scheme pattern 1": "a different string to be used by schemes matching 'scheme pattern 1'",
-        "scheme pattern 2": "a different string to be used by schemes matching 'scheme pattern 2'"   
+        "config pattern 1": "a different string to be used by configurations matching 'config pattern 1'",
+        "config pattern 2": "a different string to be used by configurations matching 'config pattern 2'"
       }
   }
 }
@@ -62,13 +62,13 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Reference`: See [Reference Properties](#reference-properties) below.
 - Enum types. Set the `type` to the name of the enum, set the value to be the case, preceded by a `.`, so `.thing`. If you need enums from a custom module, add a string array of imports to the template section.
 
-`overrides` contains values that are different to the provided `defaultValue`. The keys in this dictionary should be a regex pattern to match the scheme passed in. The values should be the same type as the `defaultValue` as specified by `type`. If two overridden values could match, the first suitable value found is used. `overrides` is optional, if not provided, all schemes will use the `defaultValue`.
+`overrides` contains values that are different to the provided `defaultValue`. The keys in this dictionary should be a regex pattern to match the configuration name passed in. The values should be the same type as the `defaultValue` as specified by `type`. If two overridden values could match, the first suitable value found is used. `overrides` is optional, if not provided, all configurations will use the `defaultValue`.
 
 Note properties can also be grouped together as per the second example. Any number of properties can be added to a named group, which will create a nested class within the parent config class with the properties attached.
 
 #### Associated Properties
 
-Sometimes you may want to map a property to the output of another property, rather than a passed in scheme. Take the example below:
+Sometimes you may want to map a property to the output of another property, rather than a passed in configuration name. Take the example below:
 
 ```
 {
@@ -92,7 +92,7 @@ Sometimes you may want to map a property to the output of another property, rath
 }
 ```
 
-The `logoName` property has an `associatedProperty`, which ties it's `overrides` to the value of `host` instead of the passed in scheme. This allows for more concise override lists, as in the example above both the "test" and "stage" scheme will produce a "logo-test.png" logoName.
+The `logoName` property has an `associatedProperty`, which ties it's `overrides` to the value of `host` instead of the passed in configuration. This allows for more concise override lists, as in the example above both the "test" and "stage" configuration will produce a "logo-test.png" logoName.
 
 Note that there are a couple of caveats when using `associatedProperty`:
 
@@ -101,7 +101,7 @@ Note that there are a couple of caveats when using `associatedProperty`:
 
 #### Reference Properties
 
-Sometimes you may want to make a property return the output of another property, depending on the passed in scheme. For example:
+Sometimes you may want to make a property return the output of another property, depending on the passed in configuration. For example:
 ```
 {
   "red": {
@@ -116,13 +116,13 @@ Sometimes you may want to make a property return the output of another property,
     "type": "Reference",
     "defaultValue": "red",
     "overrides": {
-      "greenScheme": "green"
+      "greenConfig": "green"
     }
   }
 }
 ```
 
-The `textColour` property will be `return red` for all schemes bar the `greenScheme` where it will be `return green`.
+The `textColour` property will be `return red` for all configurations bar the `greenConfig` where it will be `return green`.
 
 ### Enum
 This schema should be used for creating enums.
@@ -137,7 +137,7 @@ A sample of the schema is:
   "key": {
     "defaultValue": "",
     "overrides": {
-      "scheme pattern 1": "a dffierent string to be used by schemes matching 'scheme pattern 1'"
+      "config pattern 1": "a different string to be used by configurations matching 'config pattern 1'"
     }
   }
 }

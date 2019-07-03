@@ -29,16 +29,16 @@ class EnumConfigurationTests: XCTestCase {
     }
 
     func testItInitialisesFromAValidDictionary() throws {
-        let config = try EnumConfiguration(config: enumConfiguration, name: "Test", scheme: "Any", source: URL(fileURLWithPath: "/"))
+        let config = try EnumConfiguration(config: enumConfiguration, name: "Test", configName: "Any", source: URL(fileURLWithPath: "/"))
         expect(config.name).to(equal("Test"))
-        expect(config.scheme).to(equal("Any"))
+        expect(config.configName).to(equal("Any"))
         expect(config.type).to(equal("String"))
         expect(config.properties).to(haveCount(3))
     }
 
     func testItThrowsANoTypeErrorForAnInvalidConfig() {
         do {
-            _ = try EnumConfiguration(config: invalidEnumConfiguration, name: "Test", scheme: "Any", source: URL(fileURLWithPath: "/"))
+            _ = try EnumConfiguration(config: invalidEnumConfiguration, name: "Test", configName: "Any", source: URL(fileURLWithPath: "/"))
             fail("Expected an error to be thrown")
         } catch let error as EnumConfiguration.EnumError {
             if error != .noType {
@@ -51,7 +51,7 @@ class EnumConfigurationTests: XCTestCase {
 
     func testItThrowsAnUnknownTypeErrorForAnUnsupportedRawType() {
         do {
-            _ = try EnumConfiguration(config: intEnumConfiguration, name: "Test", scheme: "Any", source: URL(fileURLWithPath: "/"))
+            _ = try EnumConfiguration(config: intEnumConfiguration, name: "Test", configName: "Any", source: URL(fileURLWithPath: "/"))
             fail("Expected an error to be thrown")
         } catch let error as EnumConfiguration.EnumError {
             if error != .unknownType {
@@ -63,9 +63,9 @@ class EnumConfigurationTests: XCTestCase {
     }
 
     func testItCanOutputAConfigFile() throws {
-        let config = try EnumConfiguration(config: enumConfiguration, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
+        let config = try EnumConfiguration(config: enumConfiguration, name: "Test", configName: "name", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test auto-generated from scheme */
+        /* Test auto-generated from name */
         import Foundation
 
         public enum Test: String {
@@ -91,7 +91,7 @@ let enumConfiguration: [String: Any] = [
     "secondCase": [
         "defaultValue": "Another Value",
         "overrides": [
-            "scheme": "Overridden Value"
+            "name": "Overridden Value"
         ]
     ],
     "emptyCase": [
@@ -110,7 +110,7 @@ let intEnumConfiguration: [String: Any] = [
     "secondCase": [
         "defaultValue": 1,
         "overrides": [
-            "scheme": 1
+            "name": 1
         ]
     ]
 ]
