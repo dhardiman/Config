@@ -9,7 +9,7 @@
 import Foundation
 
 private let template = """
-/* {filename} auto-generated from {scheme} */
+/* {filename} auto-generated from {configName} */
 import Foundation
 
 public enum {filename}: {type} {
@@ -25,14 +25,14 @@ struct EnumConfiguration: Template {
     }
 
     let name: String
-    let scheme: String
+    let configName: String
     let type: String
 
     let properties: [String: Property]
 
-    init(config: [String: Any], name: String, scheme: String, source: URL) throws {
+    init(config: [String: Any], name: String, configName: String, source: URL) throws {
         self.name = name
-        self.scheme = scheme
+        self.configName = configName
         guard let template = config["template"] as? [String: String],
             let type = template["rawType"] else { throw EnumError.noType }
         self.type = type
@@ -59,13 +59,13 @@ struct EnumConfiguration: Template {
     var description: String {
         let propertyDeclarations = properties.compactMap { property -> String? in
             guard let configProperty = property.value as? ConfigurationProperty<String> else { return nil }
-            let value = configProperty.value(for: self.scheme)
+            let value = configProperty.value(for: self.configName)
             return "    case \(configProperty.key)" + (value.isEmpty ? "" : ##" = #"\##(value)"#"##)
         }
         .sorted()
         .joined(separator: "\n")
         return template.replacingOccurrences(of: "{filename}", with: name)
-            .replacingOccurrences(of: "{scheme}", with: scheme)
+            .replacingOccurrences(of: "{configName}", with: configName)
             .replacingOccurrences(of: "{type}", with: type)
             .replacingOccurrences(of: "{contents}", with: propertyDeclarations)
     }

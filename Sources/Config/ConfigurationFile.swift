@@ -9,7 +9,7 @@
 import Foundation
 
 private let outputTemplate = """
-/* {filename} auto-generated from {scheme} */
+/* {filename} auto-generated from {configName} */
 
 {imports}
 
@@ -40,23 +40,23 @@ struct Configuration {
         self.childConfigurations = childConfigurations
     }
 
-    private func keyForProperty(_ property: Property, in scheme: String) -> String {
+    private func keyForProperty(_ property: Property, in configName: String) -> String {
         let key: String
         /// If we've got an associated property attempt to get
         /// its keyValue (it's literal string value).
         if let associatedPropertyKey = property.associatedProperty,
             let keyProvider = properties[associatedPropertyKey] as? AssociatedPropertyKeyProviding {
-            key = keyProvider.keyValue(for: scheme)
+            key = keyProvider.keyValue(for: configName)
         } else {
-            key = scheme
+            key = configName
         }
         return key
     }
 
     // swiftlint:disable:next identifier_name IV is a well understood abbreviation
-    func stringRepresentation(scheme: String, iv: IV, encryptionKey: String?, requiresNonObjcDeclarations: Bool, publicProperties: Bool, indentWidth: Int = 0) -> String {
+    func stringRepresentation(configName: String, iv: IV, encryptionKey: String?, requiresNonObjcDeclarations: Bool, publicProperties: Bool, indentWidth: Int = 0) -> String {
         let separator = "\n\n"
-        let propertiesString = properties.values.map({ $0.propertyDeclaration(for: keyForProperty($0, in: scheme), iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjcDeclarations, isPublic: publicProperties, indentWidth: indentWidth) })
+        let propertiesString = properties.values.map({ $0.propertyDeclaration(for: keyForProperty($0, in: configName), iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjcDeclarations, isPublic: publicProperties, indentWidth: indentWidth) })
             .sorted()
             .joined(separator: separator)
 
@@ -67,7 +67,7 @@ struct Configuration {
             className = className.replacingCharacters(in: startIndex...startIndex, with: firstLetter.description.uppercased())
             return """
             \(String.indent(for: indentWidth))public enum \(className) {
-            \(config.value.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: publicProperties, indentWidth: indentWidth + 1))
+            \(config.value.stringRepresentation(configName: configName, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: publicProperties, indentWidth: indentWidth + 1))
             \(String.indent(for: indentWidth))}
             """
         }
@@ -163,7 +163,7 @@ func parseNextConfiguration(configurations: [String: Configuration], pair: (key:
 }
 
 struct ConfigurationFile: Template {
-    let scheme: String
+    let configName: String
     let name: String
 
     let rootConfiguration: Configuration
@@ -181,8 +181,8 @@ struct ConfigurationFile: Template {
 
     let defaultType: PropertyType?
 
-    init(config: [String: Any], name: String, scheme: String, source: URL) throws {
-        self.scheme = scheme
+    init(config: [String: Any], name: String, configName: String, source: URL) throws {
+        self.configName = configName
         self.name = name
 
         self.template = config["template"] as? [String: Any]
@@ -214,8 +214,8 @@ struct ConfigurationFile: Template {
         if encryptionKey != nil {
             parsedProperties[iv.key] = iv
         }
-        if template?["extensionOn"] == nil, let schemeProperty = ConfigurationProperty<String>(key: "schemeName", typeHint: "String", dict: ["defaultValue": scheme], patterns: commonPatterns) {
-            parsedProperties[schemeProperty.key] = schemeProperty
+        if template?["extensionOn"] == nil, let configNameProperty = ConfigurationProperty<String>(key: "configName", typeHint: "String", dict: ["defaultValue": configName], patterns: commonPatterns) {
+            parsedProperties[configNameProperty.key] = configNameProperty
         }
         rootConfiguration = Configuration(properties: parsedProperties, childConfigurations: root.childConfigurations)
     }
@@ -235,7 +235,7 @@ struct ConfigurationFile: Template {
     var description: String {
         let extendedClass = template?["extensionOn"] as? String
         let requiresNonObjcDeclarations = template?["requiresNonObjC"] as? Bool ?? false
-        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil)
+        let values = rootConfiguration.stringRepresentation(configName: configName, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil)
 
         let entityType = extendedClass != nil ? "extension" : "enum"
         let importsString = imports.sorted().map { "import \($0)" }.joined(separator: "\n")
@@ -245,7 +245,7 @@ struct ConfigurationFile: Template {
             .replacingOccurrences(of: "{imports}", with: importsString)
             .replacingOccurrences(of: "{entityType}", with: entityType)
             .replacingOccurrences(of: "{name}", with: extendedClass ?? name)
-            .replacingOccurrences(of: "{scheme}", with: scheme)
+            .replacingOccurrences(of: "{configName}", with: configName)
             .replacingOccurrences(of: "{contents}", with: values)
     }
 }

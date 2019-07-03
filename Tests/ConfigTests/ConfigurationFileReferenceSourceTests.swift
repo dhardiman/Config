@@ -30,7 +30,7 @@ class ConfigurationFileReferenceSourceTests: XCTestCase {
     }
 
     func testItOutputsAConfigurationWithAReferenceSource() throws {
-        let config = try ConfigurationFile(config: configurationWithReferenceInSource, name: "Test", scheme: "any", source: tempURL)
+        let config = try ConfigurationFile(config: configurationWithReferenceInSource, name: "Test", configName: "any", source: tempURL)
         let expectedOutput = """
         /* Test+ReferenceTest.swift auto-generated from any */
 
@@ -48,7 +48,7 @@ class ConfigurationFileReferenceSourceTests: XCTestCase {
     }
 
     func testItOutputsAConfigurationWithAReferenceSourceUsingOverrides() throws {
-        let config = try ConfigurationFile(config: configurationWithReferenceInSource, name: "Test", scheme: "override", source: tempURL)
+        let config = try ConfigurationFile(config: configurationWithReferenceInSource, name: "Test", configName: "override", source: tempURL)
         let expectedOutput = """
         /* Test+ReferenceTest.swift auto-generated from override */
 

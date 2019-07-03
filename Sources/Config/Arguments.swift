@@ -9,7 +9,7 @@
 import Foundation
 
 struct Arguments {
-    let scheme: String
+    let name: String
     let configURL: URL
     let additionalExtension: String?
 }
@@ -17,16 +17,16 @@ struct Arguments {
 extension Arguments {
 
     enum Option: String {
-        case scheme = "--scheme"
+        case configName = "--name"
         case configPath = "--configPath"
         case additionalExtension = "--ext"
 
-        static let all: [Option] = [.scheme, .configPath, .additionalExtension]
+        static let all: [Option] = [.configName, .configPath, .additionalExtension]
 
         var usage: String {
             switch self {
-            case .scheme:
-                return "\(rawValue)\t\t(Required) The scheme to generate for"
+            case .configName:
+                return "\(rawValue)\t\t(Required) The configuration to generate for"
             case .configPath:
                 return "\(rawValue)\t\t(Required) The path to the configuration files"
             case .additionalExtension:
@@ -42,10 +42,10 @@ extension Arguments {
     init(argumentList: [String] = CommandLine.arguments) throws {
         let argumentPairs: [Arguments.Option: String] = argumentList.arguments()
 
-        guard let scheme = argumentPairs[.scheme],
+        guard let name = argumentPairs[.configName],
             let configPath = argumentPairs[.configPath] else {
             let missingArgs = [
-                argumentPairs.keys.contains(.scheme) ? nil : "scheme",
+                argumentPairs.keys.contains(.configName) ? nil : "name",
                 argumentPairs.keys.contains(.configPath) ? nil : "configPath"
             ].compactMap { $0 }
             let lines: [String] = [
@@ -57,7 +57,7 @@ extension Arguments {
             throw MissingArgumentError(missingArguments: missingArgs)
         }
 
-        self.scheme = scheme
+        self.name = name
         self.configURL = URL(fileURLWithPath: configPath)
         self.additionalExtension = argumentPairs[.additionalExtension]
     }

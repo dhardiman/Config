@@ -14,11 +14,11 @@ class ArgumentsTests: XCTestCase {
     func testItParsesCorrectArguments() throws {
         let arguments = try Arguments(argumentList: [
             "binary",
-            "--scheme", "test-scheme",
+            "--name", "test-name",
             "--configPath", "/config/path",
             "--ext", "ext"
         ])
-        expect(arguments.scheme).to(equal("test-scheme"))
+        expect(arguments.name).to(equal("test-name"))
         expect(arguments.configURL.path).to(equal("/config/path"))
         expect(arguments.additionalExtension).to(equal("ext"))
     }
@@ -26,7 +26,7 @@ class ArgumentsTests: XCTestCase {
     func testTheExtensionIsOptional() throws {
         let arguments = try Arguments(argumentList: [
             "binary",
-            "--scheme", "test-scheme",
+            "--name", "test-name",
             "--configPath", "/config/path"
         ])
         expect(arguments.additionalExtension).to(beNil())
@@ -40,7 +40,7 @@ class ArgumentsTests: XCTestCase {
             ])
             fail("Error should have been thrown")
         } catch let error as Arguments.MissingArgumentError {
-            expect(error.missingArguments).to(equal(["scheme", "configPath"]))
+            expect(error.missingArguments).to(equal(["name", "configPath"]))
         } catch {
             fail("Wrong error thrown")
         }
@@ -50,7 +50,7 @@ class ArgumentsTests: XCTestCase {
         do {
             _ = try Arguments(argumentList: [
                 "binary",
-                "--scheme", "test-scheme",
+                "--name", "test-name",
             ])
             fail("Error should have been thrown")
         } catch let error as Arguments.MissingArgumentError {
@@ -60,7 +60,7 @@ class ArgumentsTests: XCTestCase {
         }
     }
 
-    func testItThrowsAnExceptionWhenSchemeIsNotPassed() {
+    func testItThrowsAnExceptionWhenConfigNameIsNotPassed() {
         do {
             _ = try Arguments(argumentList: [
                 "binary",
@@ -68,7 +68,7 @@ class ArgumentsTests: XCTestCase {
             ])
             fail("Error should have been thrown")
         } catch let error as Arguments.MissingArgumentError {
-            expect(error.missingArguments).to(equal(["scheme"]))
+            expect(error.missingArguments).to(equal(["name"]))
         } catch {
             fail("Wrong error thrown")
         }

@@ -45,7 +45,7 @@ class CustomPropertyTests: XCTestCase {
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
 
-    func testItOutputAPropertyDeclarationCorrectlyForAnOverriddenScheme() throws {
+    func testItOutputAPropertyDeclarationCorrectlyForAnOverriddenConfiguration() throws {
         let property = CustomProperty(key: "test", customType: givenACustomType(), dict: givenADictionaryWithValues())
         let expectedValue = """
             /// A description
@@ -142,7 +142,7 @@ class CustomPropertyArrayTests: XCTestCase {
         expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, indentWidth: 0)).to(equal(expectedValue))
     }
 
-    func testItOutputsAPropertyForAnOverriddenScheme() {
+    func testItOutputsAPropertyForAnOverriddenConfiguration() {
         let property = CustomPropertyArray(key: "test", customType: givenACustomType(for: givenATypeDictionaryWithTypeAnnotations()), dict: givenADictionaryWithArrayValues())
         let expectedValue = """
             /// A description

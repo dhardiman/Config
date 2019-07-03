@@ -21,10 +21,10 @@ class ReferencePropertyTests: XCTestCase {
         ], typeName: "String")
     }
 
-    func whenTheDeclarationIsWritten(for property: ReferenceProperty?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
+    func whenTheDeclarationIsWritten(for property: ReferenceProperty?, configName: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
         let iv = try IV(dict: ["initialise": "me"])
         print("\(iv.hash)")
-        return property?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
+        return property?.propertyDeclaration(for: configName, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -62,14 +62,14 @@ class ReferencePropertyTests: XCTestCase {
     func testItCanGetAnOverrideForAnExactMatch() throws {
         let property = givenAReferenceProperty()
         let expectedValue = "    static let test: String = helloValue"
-        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "hello")
+        let actualValue = try whenTheDeclarationIsWritten(for: property, configName: "hello")
         expect(actualValue).to(equal(expectedValue))
     }
 
     func testItCanGetAnOverrideForAPatternMatch() throws {
         let property = givenAReferenceProperty()
         let expectedValue = "    static let test: String = patternValue"
-        let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "match-a-pattern")
+        let actualValue = try whenTheDeclarationIsWritten(for: property, configName: "match-a-pattern")
         expect(actualValue).to(equal(expectedValue))
     }
 

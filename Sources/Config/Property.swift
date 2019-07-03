@@ -9,14 +9,14 @@
 import Foundation
 
 protocol AssociatedPropertyKeyProviding {
-    func keyValue(for scheme: String) -> String
+    func keyValue(for configName: String) -> String
 }
 
 protocol Property {
     var key: String { get }
     var typeName: String { get }
     var associatedProperty: String? { get }
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String
+    func propertyDeclaration(for configName: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String
 }
 
 private func dictionaryValue(_ dict: [String: Any]) -> String {

@@ -80,20 +80,20 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         return pattern.pattern
     }
 
-    func value(for scheme: String) -> T {
+    func value(for configName: String) -> T {
 
         if let override = overrides.first(where: { item in
             if associatedProperty != nil {
-                return item.key == scheme
+                return item.key == configName
             }
-            return scheme.range(of: pattern(for: item.key), options: .regularExpression) != nil
+            return configName.range(of: pattern(for: item.key), options: .regularExpression) != nil
         }) {
             return override.value
         }
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for configName: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
@@ -107,7 +107,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         } else {
             template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
         }
-        let propertyValue = value(for: scheme)
+        let propertyValue = value(for: configName)
         let outputValue: String
         if let type = type {
             outputValue = type.valueDeclaration(for: propertyValue, iv: iv, key: encryptionKey)
@@ -119,8 +119,8 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
             .replacingOccurrences(of: "{value}", with: outputValue)
     }
 
-    func keyValue(for scheme: String) -> String {
-        let overrideValue = overrides.first(where: { scheme.range(of: pattern(for: $0.key), options: .regularExpression) != nil })?.value ?? defaultValue
+    func keyValue(for configName: String) -> String {
+        let overrideValue = overrides.first(where: { configName.range(of: pattern(for: $0.key), options: .regularExpression) != nil })?.value ?? defaultValue
         guard let value = overrideValue as? String else {
             fatalError("Cannot retrieve keyValue for type \(T.self). Type must be String.")
         }
