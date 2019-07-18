@@ -54,6 +54,8 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Double`: A double value
 - `Bool`: A boolean value
 - `Colour`: A colour in hex format, will be output as a `UIColor`.
+- `DynamicColour`: A pair of colours, in hex format, that will be output as an iOS 13-compatible dynamic colour.
+- `DynamicColourReference`: A pair of colours, as properties on the current configuration or somewhere else, that will be output as an iOS 13-compatible dynamic colour.
 - `Image`: The name of an image. Will be converted to `UIImage(named: "the value")!`.
 - `Regex`: A regular expression pattern. Will be converted to `try! NSRegularExpression(patthen: "the value", options: [])`
 - `EncryptionKey`: A key to use to encrypt sensitive info.
@@ -222,6 +224,67 @@ If you find yourself repeating override patterns, for example `(PROD|STAGING)` y
     }
   }
 }
+```
+
+### DynamicColour and DynamicColourReference
+To support iOS 13's dark mode, it is possible to output colours as dynamic. For example:
+
+```
+  "background": {
+    "type": "DynamicColour",
+    "defaultValue": {
+      "light": "#FF",
+      "dark": "#00"
+    }
+  }
+```
+
+will output:
+
+```
+    @nonobjc static var background: UIColor {
+        if #available(iOS 13, *) {
+            return UIColor(dynamicProvider: {
+                if $0.userInterfaceStyle == .dark {
+                    return UIColor(white: 0.0 / 255.0, alpha: 1.0)
+                } else {
+                    return UIColor(white: 255.0 / 255.0, alpha: 1.0)
+                }
+            })
+        } else {
+            return UIColor(white: 255.0 / 255.0, alpha: 1.0)
+        }
+    }
+```
+
+Similarly, it is possible to use references to another colour, so:
+
+```
+  "background": {
+    "type": "DynamicColourReference",
+    "defaultValue": {
+      "light": "UIColor.white",
+      "dark": "UIColor.black"
+    }
+  }
+```
+
+will output:
+
+```
+    @nonobjc static var background: UIColor {
+        if #available(iOS 13, *) {
+            return UIColor(dynamicProvider: {
+                if $0.userInterfaceStyle == .dark {
+                    return UIColor.black
+                } else {
+                    return UIColor.white
+                }
+            })
+        } else {
+            return UIColor.white
+        }
+    }
 ```
 
 ## Writing your own schemas

@@ -181,6 +181,58 @@ class ConfigurationPropertyTests: XCTestCase {
         expect(actualValue).to(equal(expectedValue))
     }
 
+    func testItCanWriteADynamicColourProperty() throws {
+        let colourProperty = ConfigurationProperty<[String:String]>(key: "test", typeHint: "DynamicColour", dict: [
+            "defaultValue": [
+                "light": "#00",
+                "dark": "#FF"
+            ]
+        ])
+        let expectedValue = """
+            static var test: UIColor {
+                if #available(iOS 13, *) {
+                    return UIColor(dynamicProvider: {
+                        if $0.userInterfaceStyle == .dark {
+                            return UIColor(white: 255.0 / 255.0, alpha: 1.0)
+                        } else {
+                            return UIColor(white: 0.0 / 255.0, alpha: 1.0)
+                        }
+                    })
+                } else {
+                    return UIColor(white: 0.0 / 255.0, alpha: 1.0)
+                }
+            }
+        """
+        let actualValue = try whenTheDeclarationIsWritten(for: colourProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteADynamicReferenceColourProperty() throws {
+        let colourProperty = ConfigurationProperty<[String:String]>(key: "test", typeHint: "DynamicColourReference", dict: [
+            "defaultValue": [
+                "light": "green",
+                "dark": "blue"
+            ]
+            ])
+        let expectedValue = """
+            static var test: UIColor {
+                if #available(iOS 13, *) {
+                    return UIColor(dynamicProvider: {
+                        if $0.userInterfaceStyle == .dark {
+                            return blue
+                        } else {
+                            return green
+                        }
+                    })
+                } else {
+                    return green
+                }
+            }
+        """
+        let actualValue = try whenTheDeclarationIsWritten(for: colourProperty)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
     func testItCanWriteAnImageProperty() throws {
         let imageProperty = ConfigurationProperty<String>(key: "test", typeHint: "Image", dict: [
             "defaultValue": "image-name",

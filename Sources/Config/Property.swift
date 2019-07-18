@@ -68,6 +68,8 @@ enum PropertyType: String {
     case reference = "Reference"
     case image = "Image"
     case regex = "Regex"
+    case dynamicColour = "DynamicColour"
+    case dynamicColourReference = "DynamicColourReference"
 
     var typeName: String {
         switch self {
@@ -75,7 +77,7 @@ enum PropertyType: String {
             return "[UInt8]"
         case .dictionary:
             return "[String: Any]"
-        case .colour:
+        case .colour, .dynamicColour, .dynamicColourReference:
             return "UIColor"
         case .image:
             return "UIImage"
@@ -83,6 +85,24 @@ enum PropertyType: String {
             return "NSRegularExpression"
         default:
             return rawValue
+        }
+    }
+
+    var computedProperty: Bool {
+        switch self {
+        case .dynamicColour, .dynamicColourReference:
+            return true
+        default:
+            return false
+        }
+    }
+
+    var valueProvidesReturn: Bool {
+        switch self {
+        case .dynamicColour, .dynamicColourReference:
+            return true
+        default:
+            return false
         }
     }
 
@@ -124,8 +144,12 @@ enum PropertyType: String {
             if let int = value as? Int {
                 return "\(int)"
             } else {
-                fallthrough
+                return "\(value)"
             }
+        case .dynamicColour:
+            return dynamicColourValue(for: value as? [String: String])
+        case .dynamicColourReference:
+            return dynamicColourReferenceValue(for: value as? [String: String])
         default:
             return "\(value)"
         }
@@ -141,5 +165,36 @@ enum PropertyType: String {
         } else {
             return "UIColor(red: \(CGFloat((rgbValue & 0xFF0000) >> 16)) / 255.0, green: \(CGFloat((rgbValue & 0x00FF00) >> 8)) / 255.0, blue: \(CGFloat(rgbValue & 0x0000FF)) / 255.0, alpha: 1.0)"
         }
+    }
+
+    private func dynamicColourOutput(from value: [String: String]?, transform: ((String) -> String)? = nil) -> String {
+        guard let value = value, let light = value["light"], let dark = value["dark"] else {
+            return "Invalid dictionary. Should have a 'light' and a 'dark' value"
+        }
+        return dynamicColourOutputFor(light: transform?(light) ?? light, dark: transform?(dark) ?? dark)
+    }
+
+    private func dynamicColourOutputFor(light: String, dark: String) -> String {
+        return """
+        if #available(iOS 13, *) {
+            return UIColor(dynamicProvider: {
+                if $0.userInterfaceStyle == .dark {
+                    return \(dark)
+                } else {
+                    return \(light)
+                }
+            })
+        } else {
+            return \(light)
+        }
+        """
+    }
+
+    private func dynamicColourValue(for value: [String: String]?) -> String {
+        return dynamicColourOutput(from: value) { self.colourValue(for: $0) }
+    }
+
+    private func dynamicColourReferenceValue(for value: [String: String]?) -> String {
+        return dynamicColourOutput(from: value, transform: nil)
     }
 }
