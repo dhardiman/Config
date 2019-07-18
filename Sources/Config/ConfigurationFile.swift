@@ -121,6 +121,8 @@ func parseNextProperty(properties: [String: Property], pair: (key: String, value
                 return properties
             }
             copy[pair.key] = ReferenceProperty(key: pair.key, dict: dict, typeName: referenceType.typeName)
+        case .dynamicColour:
+            copy[pair.key] = ConfigurationProperty<[String: String]>(key: pair.key, typeHint: typeHintValue, dict: dict, patterns: patterns)
         }
     } else {
         if let customType = customTypes.first(where: { $0.typeName == typeHintValue }) {

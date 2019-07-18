@@ -81,7 +81,6 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
     }
 
     func value(for scheme: String) -> T {
-
         if let override = overrides.first(where: { item in
             if associatedProperty != nil {
                 return item.key == scheme
@@ -99,13 +98,11 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
         }
         if requiresNonObjCDeclarations {
-            template += """
-            \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") static var {key}: {typeName} {
-            \(String.indent(for: indentWidth + 1))return {value}
-            \(String.indent(for: indentWidth))}
-            """
+            template += computedProperty(nonObjc: true, indentWidth: indentWidth, isPublic: isPublic, outputProvidesReturn: type?.valueProvidesReturn ?? false)
         } else {
-            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
+            template += (type?.computedProperty ?? false) ?
+                computedProperty(nonObjc: false, indentWidth: indentWidth, isPublic: isPublic, outputProvidesReturn: type?.valueProvidesReturn ?? false) :
+                staticProperty(indentWidth: indentWidth, isPublic: isPublic)
         }
         let propertyValue = value(for: scheme)
         let outputValue: String
@@ -116,7 +113,17 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         }
         return template.replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
-            .replacingOccurrences(of: "{value}", with: outputValue)
+            .replacingOccurrences(of: "{value}", with: reindent(value: outputValue, to: indentWidth))
+    }
+
+    private func reindent(value: String, to indentWidth: Int) -> String {
+        let split = value.split(separator: "\n")
+        guard split.count > 1 else { return value }
+        return split.enumerated().map {
+            guard $0.offset > 0 else { return String($0.element) }
+            return String.indent(for: indentWidth + 1) + $0.element
+        }
+        .joined(separator: "\n")
     }
 
     func keyValue(for scheme: String) -> String {
@@ -125,5 +132,25 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
             fatalError("Cannot retrieve keyValue for type \(T.self). Type must be String.")
         }
         return value
+    }
+
+    private func computedProperty(nonObjc: Bool, indentWidth: Int, isPublic: Bool, outputProvidesReturn: Bool) -> String {
+        let modifiers = [
+            nonObjc ? "@nonobjc" : nil,
+            isPublic ? "public" : nil,
+            "static",
+            "var"
+        ]
+        .compactMap { $0 }
+        .joined(separator: " ")
+        return """
+        \(String.indent(for: indentWidth))\(modifiers) {key}: {typeName} {
+        \(String.indent(for: indentWidth + 1))\(outputProvidesReturn ? "" : "return "){value}
+        \(String.indent(for: indentWidth))}
+        """
+    }
+
+    private func staticProperty(indentWidth: Int, isPublic: Bool) -> String {
+        return "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
     }
 }
