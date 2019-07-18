@@ -171,16 +171,7 @@ enum PropertyType: String {
         guard let value = value, let light = value["light"], let dark = value["dark"] else {
             return "Invalid dictionary. Should have a 'light' and a 'dark' value"
         }
-        let lightOutput: String
-        let darkOutput: String
-        if let transform = transform {
-            lightOutput = transform(light)
-            darkOutput = transform(dark)
-        } else {
-            lightOutput = light
-            darkOutput = dark
-        }
-        return dynamicColourOutputFor(light: lightOutput, dark: darkOutput)
+        return dynamicColourOutputFor(light: transform?(light) ?? light, dark: transform?(dark) ?? dark)
     }
 
     private func dynamicColourOutputFor(light: String, dark: String) -> String {
