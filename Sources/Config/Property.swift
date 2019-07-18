@@ -99,7 +99,7 @@ enum PropertyType: String {
 
     var valueProvidesReturn: Bool {
         switch self {
-        case .dynamicColour,.dynamicColourReference:
+        case .dynamicColour, .dynamicColourReference:
             return true
         default:
             return false
