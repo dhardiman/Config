@@ -69,6 +69,7 @@ enum PropertyType: String {
     case image = "Image"
     case regex = "Regex"
     case dynamicColour = "DynamicColour"
+    case dynamicColourReference = "DynamicColourReference"
 
     var typeName: String {
         switch self {
@@ -76,7 +77,7 @@ enum PropertyType: String {
             return "[UInt8]"
         case .dictionary:
             return "[String: Any]"
-        case .colour, .dynamicColour:
+        case .colour, .dynamicColour, .dynamicColourReference:
             return "UIColor"
         case .image:
             return "UIImage"
@@ -89,7 +90,7 @@ enum PropertyType: String {
 
     var computedProperty: Bool {
         switch self {
-        case .dynamicColour:
+        case .dynamicColour, .dynamicColourReference:
             return true
         default:
             return false
@@ -98,7 +99,7 @@ enum PropertyType: String {
 
     var valueProvidesReturn: Bool {
         switch self {
-        case .dynamicColour:
+        case .dynamicColour,.dynamicColourReference:
             return true
         default:
             return false
@@ -147,6 +148,8 @@ enum PropertyType: String {
             }
         case .dynamicColour:
             return dynamicColourValue(for: value as? [String: String])
+        case .dynamicColourReference:
+            return dynamicColourReferenceValue(for: value as? [String: String])
         default:
             return "\(value)"
         }
@@ -164,24 +167,43 @@ enum PropertyType: String {
         }
     }
 
-    private func dynamicColourValue(for value: [String: String]?) -> String {
+    private func dynamicColourOutput(from value: [String: String]?, transform: ((String) -> String)? = nil) -> String {
         guard let value = value, let light = value["light"], let dark = value["dark"] else {
             return "Invalid dictionary. Should have a 'light' and a 'dark' value"
         }
-        let lightOutput = colourValue(for: light)
-        let darkOutput = colourValue(for: dark)
+        let lightOutput: String
+        let darkOutput: String
+        if let transform = transform {
+            lightOutput = transform(light)
+            darkOutput = transform(dark)
+        } else {
+            lightOutput = light
+            darkOutput = dark
+        }
+        return dynamicColourOutputFor(light: lightOutput, dark: darkOutput)
+    }
+
+    private func dynamicColourOutputFor(light: String, dark: String) -> String {
         return """
         if #available(iOS 13, *) {
             return UIColor(dynamicProvider: {
                 if $0.userInterfaceStyle == .dark {
-                    return \(darkOutput)
+                    return \(dark)
                 } else {
-                    return \(lightOutput)
+                    return \(light)
                 }
             })
         } else {
-            return \(lightOutput)
+            return \(light)
         }
         """
+    }
+
+    private func dynamicColourValue(for value: [String: String]?) -> String {
+        return dynamicColourOutput(from: value) { self.colourValue(for: $0) }
+    }
+
+    private func dynamicColourReferenceValue(for value: [String: String]?) -> String {
+        return dynamicColourOutput(from: value, transform: nil)
     }
 }
