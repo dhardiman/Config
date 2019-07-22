@@ -10,6 +10,8 @@ import Foundation
 
 public class ConfigGenerator {
 
+    var printer: Printing = Printer()
+
     public init() {}
 
     public func run(_ arguments: [String]) throws {
@@ -44,15 +46,15 @@ public class ConfigGenerator {
                 if newData == currentData {
                     shouldWrite = false
                 } else {
-                    print("Existing file different from new file, writing \(url.lastPathComponent)\nExisting: \(currentData), New: \(newData)")
+                    printer.print(message: "Existing file different from new file, writing \(url.lastPathComponent)\nExisting: \(currentData), New: \(newData)")
                 }
             } else {
-                print("Existing file not present, writing \(url.lastPathComponent)")
+                printer.print(message: "Existing file not present, writing \(url.lastPathComponent)")
             }
             if shouldWrite == false {
-                print("Ignoring \(url.lastPathComponent) as it has not changed")
+                printer.print(message: "Ignoring \(url.lastPathComponent) as it has not changed")
             } else {
-                print("Wrote \(url.lastPathComponent)")
+                printer.print(message: "Wrote \(url.lastPathComponent)")
                 try configurationFile.description.write(to: swiftOutput, atomically: true, encoding: .utf8)
             }
         }
@@ -60,5 +62,15 @@ public class ConfigGenerator {
 
     public var usage: String {
         return Arguments.Option.all.compactMap { $0.usage }.joined(separator: "\n")
+    }
+}
+
+protocol Printing {
+    func print(message: String)
+}
+
+struct Printer: Printing {
+    func print(message: String) {
+        Swift.print(message)
     }
 }
