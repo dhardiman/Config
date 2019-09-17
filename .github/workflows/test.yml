@@ -9,6 +9,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: Bundle install
+      run: bundle install
     - name: Select Xcode Version
       run: sudo xcode-select -switch /Applications/Xcode_11.app
     - name: Generate xcode project for code coverage
