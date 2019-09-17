@@ -1,0 +1,21 @@
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    name: Test
+    runs-on: macOS-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Select Xcode Version
+      run: sudo xcode-select -switch /Applications/Xcode_11.app
+    - name: Generate xcode project for code coverage
+      run: swift package generate-xcodeproj --enable-code-coverage
+    - name: Run tests
+      run: |
+        xcodebuild -scheme Config-Package test |
+        xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+    - name: Post coverage
+      run: bundle exec slather
