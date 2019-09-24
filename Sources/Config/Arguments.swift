@@ -12,6 +12,7 @@ struct Arguments {
     let scheme: String
     let configURL: URL
     let additionalExtension: String?
+    let verbose: Bool
 }
 
 extension Arguments {
@@ -20,8 +21,9 @@ extension Arguments {
         case scheme = "--scheme"
         case configPath = "--configPath"
         case additionalExtension = "--ext"
+        case verbose = "--verbose"
 
-        static let all: [Option] = [.scheme, .configPath, .additionalExtension]
+        static let all: [Option] = [.scheme, .configPath, .additionalExtension, .verbose]
 
         var usage: String {
             switch self {
@@ -31,6 +33,8 @@ extension Arguments {
                 return "\(rawValue)\t\t(Required) The path to the configuration files"
             case .additionalExtension:
                 return "\(rawValue)\t\t(Optional) An additional extension slug to add before .swift in the output files. Useful for .gitignore"
+            case .verbose:
+                return "\(rawValue)\t\t(Optional) Should extra logging be output?"
             }
         }
     }
@@ -60,6 +64,7 @@ extension Arguments {
         self.scheme = scheme
         self.configURL = URL(fileURLWithPath: configPath)
         self.additionalExtension = argumentPairs[.additionalExtension]
+        self.verbose = argumentPairs[.verbose] ?? false
     }
 }
 

@@ -25,6 +25,9 @@ public class ConfigGenerator {
         ]
 
         try configFiles.forEach { url in
+            if arguments.verbose, let configFileValue = try? String(contentsOf: url) {
+                printer.print(message: "Processing config file \(configFileValue)")
+            }
             guard let config = dictionaryFromJSON(at: url) else {
                 throw ConfigError.badJSON
             }
@@ -43,6 +46,9 @@ public class ConfigGenerator {
             let newData = configurationFile.description
             var shouldWrite = true
             if let currentData = try? String(contentsOf: swiftOutput) {
+                if arguments.verbose {
+                    printer.print(message: "Existing file contents: \(currentData)")
+                }
                 if newData == currentData {
                     shouldWrite = false
                 } else {
