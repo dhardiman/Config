@@ -64,7 +64,7 @@ extension Arguments {
         self.scheme = scheme
         self.configURL = URL(fileURLWithPath: configPath)
         self.additionalExtension = argumentPairs[.additionalExtension]
-        self.verbose = argumentPairs[.verbose] ?? false
+        self.verbose = argumentPairs[.verbose] == "true"
     }
 }
 
