@@ -45,23 +45,31 @@ public class ConfigGenerator {
             swiftOutput.appendPathExtension("swift")
             let newData = configurationFile.description
             var shouldWrite = true
-            if let currentData = try? String(contentsOf: swiftOutput) {
+            if arguments.verbose {
+                printer.print(message: "Checking existing file at \(swiftOutput.path)")
+            }
+            if let existingData = try? Data(contentsOf: swiftOutput), let currentData = String(data: existingData, encoding: .utf8) {
                 if arguments.verbose {
                     printer.print(message: "Existing file contents: \(currentData)")
                 }
                 if newData == currentData {
                     shouldWrite = false
                 } else {
-                    printer.print(message: "Existing file different from new file, writing \(url.lastPathComponent)\nExisting: \(currentData), New: \(newData)")
+                    printer.print(message: "Existing file at \(swiftOutput.path) different from new file, writing \(url.lastPathComponent)\nExisting: \(currentData), New: \(newData)")
                 }
             } else {
-                printer.print(message: "Existing file not present, writing \(url.lastPathComponent)")
+                printer.print(message: "Existing file not present at \(swiftOutput.path), writing \(url.lastPathComponent)")
             }
             if shouldWrite == false {
                 printer.print(message: "Ignoring \(url.lastPathComponent) as it has not changed")
             } else {
-                printer.print(message: "Wrote \(url.lastPathComponent)")
-                try configurationFile.description.write(to: swiftOutput, atomically: true, encoding: .utf8)
+                do {
+                    try configurationFile.description.write(to: swiftOutput, atomically: true, encoding: .utf8)
+                    printer.print(message: "Wrote \(url.lastPathComponent) to \(swiftOutput.path)")
+                } catch {
+                    printer.print(message: "Failed to write to \(swiftOutput.path)")
+                    throw error
+                }
             }
         }
     }

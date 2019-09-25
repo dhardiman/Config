@@ -15,7 +15,9 @@ class ConfigGeneratorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
+        let url = URL(fileURLWithPath: NSTemporaryDirectory())
+        let amendedURL = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: []).first?.deletingLastPathComponent()
+        tempURL = amendedURL ?? url
     }
 
     override func tearDown() {
@@ -70,8 +72,8 @@ class ConfigGeneratorTests: XCTestCase {
         let outputURL = url(for: "standard")
         let inputURL = configURL(for: "standard")
         let currentTouchDate = try FileManager.default.attributesOfItem(atPath: outputURL.path)[.modificationDate] as? Date
-        expect(mockPrinter.receivedMessages.first).to(equal("Existing file not present, writing \(inputURL.lastPathComponent)"))
-        expect(mockPrinter.receivedMessages.last).to(equal("Wrote \(inputURL.lastPathComponent)"))
+        expect(mockPrinter.receivedMessages.first).to(equal("Existing file not present at \(outputURL.path), writing \(inputURL.lastPathComponent)"))
+        expect(mockPrinter.receivedMessages.last).to(equal("Wrote \(inputURL.lastPathComponent) to \(outputURL.path)"))
         mockPrinter.reset()
         try generator.run(validOptions())
         let newTouchDate = try FileManager.default.attributesOfItem(atPath: outputURL.path)[.modificationDate] as? Date
@@ -95,7 +97,7 @@ class ConfigGeneratorTests: XCTestCase {
         try generator.run(validOptions())
         let newTouchDate = try FileManager.default.attributesOfItem(atPath: outputURL.path)[.modificationDate] as? Date
         expect(currentTouchDate).to(beLessThan(newTouchDate))
-        expect(mockPrinter.receivedMessages.first).to(equal("Existing file different from new file, writing \(inputURL.lastPathComponent)\nExisting: \(expectedStrings["standard"]!), New: \(expectedStrings["enumconfig"]!.replacingOccurrences(of: "enumconfig", with: "standard"))"))
+        expect(mockPrinter.receivedMessages.first).to(equal("Existing file at \(outputURL.path) different from new file, writing \(inputURL.lastPathComponent)\nExisting: \(expectedStrings["standard"]!), New: \(expectedStrings["enumconfig"]!.replacingOccurrences(of: "enumconfig", with: "standard"))"))
     }
 
     func testItCanPrintItsUsage() {
