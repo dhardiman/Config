@@ -22,10 +22,10 @@ class ConfigurationPropertyTests: XCTestCase {
         ])
     }
 
-    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
+    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, instanceProperty: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
         let iv = try IV(dict: ["initialise": "me"])
         print("\(iv.hash)")
-        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
+        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -37,8 +37,8 @@ class ConfigurationPropertyTests: XCTestCase {
 
     func testItCanWriteADeclarationForAnEmptyStringProperty() throws {
         let stringProperty = givenAStringProperty()
-        let expectedValue = ##"    static let test: String = """##
-        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, scheme: "empty")
+        let expectedValue = ##"    let test: String = """##
+        let actualValue = try whenTheDeclarationIsWritten(for: stringProperty, scheme: "empty", instanceProperty: true)
         expect(actualValue).to(equal(expectedValue))
     }
 

@@ -16,7 +16,7 @@ protocol Property {
     var key: String { get }
     var typeName: String { get }
     var associatedProperty: String? { get }
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String
 }
 
 private func dictionaryValue(_ dict: [String: Any]) -> String {

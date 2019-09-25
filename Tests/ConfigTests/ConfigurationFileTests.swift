@@ -337,6 +337,26 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.description).to(equal(expectedOutput))
     }
 
+    func testItCanOutputValuesAsInstanceVariables() throws {
+        let config = try ConfigurationFile(config: configurationForInstanceVariables, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
+        let expectedOutput = """
+        /* Test.swift auto-generated from any */
+
+        import Foundation
+
+        // swiftlint:disable force_unwrapping type_body_length file_length superfluous_disable_command
+        public struct Test {
+            public let property: String = #"A test"#
+
+            public let schemeName: String = #"any"#
+        }
+
+        // swiftlint:enable force_unwrapping type_body_length file_length superfluous_disable_command
+
+        """
+        expect(config.description).to(equal(expectedOutput))
+    }
+
     func givenAConfigDictionary(withTemplate template: [String: Any]? = nil) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         dictionary["template"] = template
@@ -525,5 +545,16 @@ private let configurationWithCommonPatterns: [String: Any] = [
         "overrides": [
             "test value": "correct"
         ]
+    ]
+]
+
+private let configurationForInstanceVariables: [String: Any] = [
+    "template": [
+        "entityType": "struct",
+        "instanceVariables": true
+    ],
+    "property": [
+        "type": "String",
+        "defaultValue": "A test"
     ]
 ]

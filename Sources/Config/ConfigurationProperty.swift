@@ -92,17 +92,17 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
         }
         if requiresNonObjCDeclarations {
-            template += computedProperty(nonObjc: true, indentWidth: indentWidth, isPublic: isPublic, outputProvidesReturn: type?.valueProvidesReturn ?? false)
+            template += computedProperty(nonObjc: true, indentWidth: indentWidth, isPublic: isPublic, instanceProperty: instanceProperty, outputProvidesReturn: type?.valueProvidesReturn ?? false)
         } else {
             template += (type?.computedProperty ?? false) ?
-                computedProperty(nonObjc: false, indentWidth: indentWidth, isPublic: isPublic, outputProvidesReturn: type?.valueProvidesReturn ?? false) :
-                staticProperty(indentWidth: indentWidth, isPublic: isPublic)
+                computedProperty(nonObjc: false, indentWidth: indentWidth, isPublic: isPublic, instanceProperty: instanceProperty, outputProvidesReturn: type?.valueProvidesReturn ?? false) :
+                storedProperty(indentWidth: indentWidth, isPublic: isPublic, instanceProperty: instanceProperty)
         }
         let propertyValue = value(for: scheme)
         let outputValue: String
@@ -134,11 +134,11 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         return value
     }
 
-    private func computedProperty(nonObjc: Bool, indentWidth: Int, isPublic: Bool, outputProvidesReturn: Bool) -> String {
+    private func computedProperty(nonObjc: Bool, indentWidth: Int, isPublic: Bool, instanceProperty: Bool, outputProvidesReturn: Bool) -> String {
         let modifiers = [
             nonObjc ? "@nonobjc" : nil,
             isPublic ? "public" : nil,
-            "static",
+            (instanceProperty ? "" : "static"),
             "var"
         ]
         .compactMap { $0 }
@@ -150,7 +150,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         """
     }
 
-    private func staticProperty(indentWidth: Int, isPublic: Bool) -> String {
-        return "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
+    private func storedProperty(indentWidth: Int, isPublic: Bool, instanceProperty: Bool) -> String {
+        return "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")\(instanceProperty ? "" : "static ")let {key}: {typeName} = {value}"
     }
 }

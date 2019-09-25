@@ -39,19 +39,19 @@ struct ReferenceProperty: Property {
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
         }
         if requiresNonObjCDeclarations {
             template += """
-            \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") static var \(key): \(typeName) {
+            \(String.indent(for: indentWidth))@nonobjc\(isPublic ? " public" : "") \(instanceProperty ? "" : "static ")var \(key): \(typeName) {
             \(String.indent(for: indentWidth + 1))return \(value(for: scheme))
             \(String.indent(for: indentWidth))}
             """
         } else {
-            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let \(key): \(typeName) = \(value(for: scheme))"
+            template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")\(instanceProperty ? "" : "static ")let \(key): \(typeName) = \(value(for: scheme))"
         }
         return template
     }

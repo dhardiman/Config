@@ -21,10 +21,10 @@ class ReferencePropertyTests: XCTestCase {
         ], typeName: "String")
     }
 
-    func whenTheDeclarationIsWritten(for property: ReferenceProperty?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
+    func whenTheDeclarationIsWritten(for property: ReferenceProperty?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, instanceProperty: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
         let iv = try IV(dict: ["initialise": "me"])
         print("\(iv.hash)")
-        return property?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, indentWidth: indentWidth)
+        return property?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -38,6 +38,13 @@ class ReferencePropertyTests: XCTestCase {
         let property = givenAReferenceProperty()
         let expectedValue = "    public static let test: String = testValue"
         let actualValue = try whenTheDeclarationIsWritten(for: property, isPublic: true)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCreatesAnInstancePropertyWhenRequired() throws {
+        let property = givenAReferenceProperty()
+        let expectedValue = "    let test: String = testValue"
+        let actualValue = try whenTheDeclarationIsWritten(for: property, instanceProperty: true)
         expect(actualValue).to(equal(expectedValue))
     }
 

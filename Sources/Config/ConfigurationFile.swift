@@ -54,9 +54,9 @@ struct Configuration {
     }
 
     // swiftlint:disable:next identifier_name IV is a well understood abbreviation
-    func stringRepresentation(scheme: String, iv: IV, encryptionKey: String?, requiresNonObjcDeclarations: Bool, publicProperties: Bool, indentWidth: Int = 0) -> String {
+    func stringRepresentation(scheme: String, iv: IV, encryptionKey: String?, requiresNonObjcDeclarations: Bool, publicProperties: Bool, instanceProperties: Bool, indentWidth: Int = 0) -> String {
         let separator = "\n\n"
-        let propertiesString = properties.values.map({ $0.propertyDeclaration(for: keyForProperty($0, in: scheme), iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjcDeclarations, isPublic: publicProperties, indentWidth: indentWidth) })
+        let propertiesString = properties.values.map({ $0.propertyDeclaration(for: keyForProperty($0, in: scheme), iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjcDeclarations, isPublic: publicProperties, instanceProperty: instanceProperties, indentWidth: indentWidth) })
             .sorted()
             .joined(separator: separator)
 
@@ -67,7 +67,7 @@ struct Configuration {
             className = className.replacingCharacters(in: startIndex...startIndex, with: firstLetter.description.uppercased())
             return """
             \(String.indent(for: indentWidth))public enum \(className) {
-            \(config.value.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: publicProperties, indentWidth: indentWidth + 1))
+            \(config.value.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: publicProperties, instanceProperties: instanceProperties, indentWidth: indentWidth + 1))
             \(String.indent(for: indentWidth))}
             """
         }
@@ -183,6 +183,10 @@ struct ConfigurationFile: Template {
 
     let defaultType: PropertyType?
 
+    let entityType: String?
+
+    let outputAsInstanceVariables: Bool
+
     init(config: [String: Any], name: String, scheme: String, source: URL) throws {
         self.scheme = scheme
         self.name = name
@@ -199,6 +203,9 @@ struct ConfigurationFile: Template {
         } else {
             self.defaultType = nil
         }
+
+        self.entityType = template?["entityType"] as? String
+        self.outputAsInstanceVariables = (template?["instanceVariables"] as? Bool) ?? false
 
         var referenceSource: [String: Any]?
         if let referenceSourceFileName = template?["referenceSource"] as? String {
@@ -237,9 +244,9 @@ struct ConfigurationFile: Template {
     var description: String {
         let extendedClass = template?["extensionOn"] as? String
         let requiresNonObjcDeclarations = template?["requiresNonObjC"] as? Bool ?? false
-        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil)
+        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil, instanceProperties: outputAsInstanceVariables)
 
-        let entityType = extendedClass != nil ? "extension" : "enum"
+        let entityType = extendedClass != nil ? "extension" : (self.entityType ?? "enum")
         let importsString = imports.sorted().map { "import \($0)" }.joined(separator: "\n")
 
         return outputTemplate

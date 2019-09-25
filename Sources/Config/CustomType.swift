@@ -55,8 +55,8 @@ struct CustomProperty: Property {
         return customType.typeName
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
-        return template(for: description, isPublic: isPublic, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+        return template(for: description, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
             .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
     }
@@ -94,8 +94,8 @@ struct CustomPropertyArray: Property {
         return "[\(customType.typeName)]"
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, indentWidth: Int) -> String {
-        return template(for: description, isPublic: isPublic, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+        return template(for: description, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
             .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
     }
@@ -131,12 +131,12 @@ private func valueString(for placeholder: Placeholder, from value: Any) -> Strin
     }
 }
 
-private func template(for description: String?, isPublic: Bool, indentWidth: Int) -> String {
+private func template(for description: String?, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
     var template: String = ""
     if let description = description {
         template += "\(String.indent(for: indentWidth))/// \(description)\n"
     }
-    template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")static let {key}: {typeName} = {value}"
+    template += "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")\(instanceProperty ? "" : "static ")let {key}: {typeName} = {value}"
     return template
 }
 
