@@ -26,7 +26,7 @@ public class ConfigGenerator {
 
         try configFiles.forEach { url in
             if arguments.verbose, let configFileValue = try? String(contentsOf: url) {
-                printer.print(message: "Processing config file \(configFileValue)")
+                printer.print(message: "Processing config file at \(url.path):\n \(configFileValue)")
             }
             guard let config = dictionaryFromJSON(at: url) else {
                 throw ConfigError.badJSON
