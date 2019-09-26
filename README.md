@@ -291,3 +291,6 @@ will output:
 Just add a new class or struct to the project and implement `Template`. Add your new parser to the `templates` array in main.swift. Your template should inspect a `template` dictionary in any config and decide whether it can parse it. Either using a `name` item, or through other means. Ensure `ConfigurationFile` is the last item in that array. As the default schema parser it claims to be able to parse all files.
 
 As new templates can be written from scratch, there is no pre-defined schema that your json file should adhere to, but for the sake of readability for other contributors, it would probably be sensible if it resembled the default schema as closely as possible.
+
+## Running as a build phase
+If running as a build phase within Xcode, it's recommended to use xcode file lists, both for the source input and the generated files. The input file list will ensure Xcode expires its cache of files and you build with the latest version. The output file list will ensure Xcode waits for your files to be generated before proceeding.
