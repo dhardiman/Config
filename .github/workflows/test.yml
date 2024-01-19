@@ -4,14 +4,8 @@ on: [push]
 
 jobs:
   test:
-    name: Test on destination ${{ matrix.configurations.destination }}
+    name: Test on destination macOS
     runs-on: macOS-13
-    strategy:
-      matrix:
-        configurations:
-          - destination: "platform=macOS"
-            scheme: "Fetch-macOS"
-            platform: "macOS"
     
     steps:
     - name: Xcode Select
@@ -20,15 +14,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Bundler
-      run: bundle install
+    - name: Run tests
+      run: swift test --enable-code-coverage
 
-    - name: Generate xcode project for code coverage
-      run: swift package generate-xcodeproj --enable-code-coverage
-
-    - name: Run tests on ${{ matrix.configurations.destination }}
-      run: xcodebuild -scheme Config-Package test |
-           xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
-
-    - name: Post Coverage
-      run: bundle exec slather
