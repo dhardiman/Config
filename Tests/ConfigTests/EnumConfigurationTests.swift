@@ -65,7 +65,7 @@ class EnumConfigurationTests: XCTestCase {
     func testItCanOutputAConfigFile() throws {
         let config = try EnumConfiguration(config: enumConfiguration, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test auto-generated from scheme */
+        // Test auto-generated from scheme
         import Foundation
 
         public enum Test: String {

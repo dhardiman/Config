@@ -23,7 +23,7 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.iv.hash).to(equal(testIV.hash))
         expect(config.filename).to(beNil())
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
@@ -45,7 +45,7 @@ class ConfigurationFileTests: XCTestCase {
         expect(config.iv.hash).to(equal(testIV.hash))
         expect(config.filename).to(equal("UIColor+Test"))
         let expectedOutput = """
-        /* UIColor+Test.swift auto-generated from any */
+        // UIColor+Test.swift auto-generated from any
 
         import Foundation
 
@@ -64,7 +64,7 @@ class ConfigurationFileTests: XCTestCase {
         let dict = givenAConfigDictionary(withTemplate: importsTemplate)
         let config = try ConfigurationFile(config: dict, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import AnotherFramework
         import Foundation
@@ -84,7 +84,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItCanOutputEncryptedValues() throws {
         let config = try ConfigurationFile(config: configWithEncryption, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
@@ -108,7 +108,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItUsesOverridesAndOrdersProperties() throws {
         let config = try ConfigurationFile(config: configWithOverride, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        // Test.swift auto-generated from scheme
 
         import Foundation
 
@@ -130,7 +130,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItItCanWriteReferenceProperties() throws {
         let config = try ConfigurationFile(config: configWithReferenceProperty, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        // Test.swift auto-generated from scheme
 
         import Foundation
 
@@ -152,7 +152,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItCanWriteNonObjcProperties() throws {
         let config = try ConfigurationFile(config: givenAConfigDictionary(withTemplate: nonObjCTemplate), name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
@@ -172,7 +172,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItOutputsGroups() throws {
         let config = try ConfigurationFile(config: groupedConfig, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        // Test.swift auto-generated from scheme
 
         import Foundation
 
@@ -198,7 +198,7 @@ class ConfigurationFileTests: XCTestCase {
     func testAssociatedPropertiesAreOutputForDefaults() throws {
         let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", scheme: "scheme", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from scheme */
+        // Test.swift auto-generated from scheme
 
         import Foundation
 
@@ -221,7 +221,7 @@ class ConfigurationFileTests: XCTestCase {
     func testAssociatedPropertiesAreOutputForScheme() throws {
         let config = try ConfigurationFile(config: configWithAssociatedProperties, name: "Test", scheme: "prod", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from prod */
+        // Test.swift auto-generated from prod
 
         import Foundation
 
@@ -244,7 +244,7 @@ class ConfigurationFileTests: XCTestCase {
     func testPropertiesAreOutputForVariousTypes() throws {
         let config = try ConfigurationFile(config: configurationWithDifferentTypes, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
@@ -274,7 +274,7 @@ class ConfigurationFileTests: XCTestCase {
     func testPropertiesAreOutputForCustomTypes() throws {
         let config = try ConfigurationFile(config: configurationWithCustomType, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
@@ -296,7 +296,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItUsesADefaultTypeIfOneIsNotSpecified() throws {
         let config = try ConfigurationFile(config: configurationWithDefaultType, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
@@ -316,7 +316,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItCanUsePatternsForMatchingOverrides() throws {
         let config = try ConfigurationFile(config: configurationWithCommonPatterns, name: "Test", scheme: "PROD", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from PROD */
+        // Test.swift auto-generated from PROD
 
         import Foundation
 
@@ -340,7 +340,7 @@ class ConfigurationFileTests: XCTestCase {
     func testItCanOutputValuesAsInstanceVariables() throws {
         let config = try ConfigurationFile(config: configurationForInstanceVariables, name: "Test", scheme: "any", source: URL(fileURLWithPath: "/"))
         let expectedOutput = """
-        /* Test.swift auto-generated from any */
+        // Test.swift auto-generated from any
 
         import Foundation
 
