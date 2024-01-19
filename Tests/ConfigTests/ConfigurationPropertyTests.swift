@@ -347,6 +347,22 @@ class ConfigurationPropertyTests: XCTestCase {
         expect(actualValue).to(equal(expectedValue))
     }
 
+    func testItCanWriteAnEnvironmentVariableProperty() throws {
+        // Set an environment variable using the libc API
+        setenv("SOMETHING", "testValue", 1)
+        let property = ConfigurationProperty<String>(key: "test", typeHint: "EnvironmentVariable", dict: ["defaultValue": "SOMETHING"])
+        let expectedValue = ##"    static let test: String = #"testValue"#"##
+        let actualValue = try whenTheDeclarationIsWritten(for: property)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItWritesAnEmptyStringForAnEnvironmentVariableThatIsNotSet() throws {
+        let property = ConfigurationProperty<String>(key: "test", typeHint: "EnvironmentVariable", dict: ["defaultValue": "DOESNT_EXIST"])
+        let expectedValue = ##"    static let test: String = """##
+        let actualValue = try whenTheDeclarationIsWritten(for: property)
+        expect(actualValue).to(equal(expectedValue))
+    }
+
     func testItCanUseCommonPatternsForOverrides() throws {
         let dict: [String: Any] = [
             "defaultValue": "test value",

@@ -70,6 +70,7 @@ enum PropertyType: String {
     case regex = "Regex"
     case dynamicColour = "DynamicColour"
     case dynamicColourReference = "DynamicColourReference"
+    case environmentVariable = "EnvironmentVariable"
 
     var typeName: String {
         switch self {
@@ -83,6 +84,8 @@ enum PropertyType: String {
             return "UIImage"
         case .regex:
             return "NSRegularExpression"
+        case .environmentVariable:
+            return "String"
         default:
             return rawValue
         }
@@ -150,6 +153,13 @@ enum PropertyType: String {
             return dynamicColourValue(for: value as? [String: String])
         case .dynamicColourReference:
             return dynamicColourReferenceValue(for: value as? [String: String])
+        case .environmentVariable:
+            guard let environmentVariable = value as? String,
+                  let rawValue = getenv(environmentVariable),
+                  let stringValue = String(utf8String: rawValue) else {
+                return "\"\""
+            }
+            return "#\"\(stringValue)\"#"
         default:
             return "\(value)"
         }
