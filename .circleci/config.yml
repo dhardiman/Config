@@ -2,7 +2,7 @@ version: 2
 jobs:
   macOStest:
     macos:
-      xcode: "10.2.0"
+      xcode: 15.2.0
     steps:
       - checkout
       - run: bundle install
