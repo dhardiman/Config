@@ -9,7 +9,7 @@
 import Foundation
 
 private let outputTemplate = """
-/* {filename} auto-generated from {scheme} */
+// {filename} auto-generated from {scheme}
 
 {imports}
 

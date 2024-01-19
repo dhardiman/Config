@@ -9,7 +9,7 @@
 import Foundation
 
 private let template = """
-/* {filename} auto-generated from {scheme} */
+// {filename} auto-generated from {scheme}
 import Foundation
 
 public enum {filename}: {type} {

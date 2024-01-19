@@ -155,7 +155,7 @@ private let filenames = [
 
 private let expectedStrings = [
     "enumconfig": """
-    /* enumconfig auto-generated from any */
+    // enumconfig auto-generated from any
     import Foundation
 
     public enum enumconfig: String {
@@ -166,7 +166,7 @@ private let expectedStrings = [
 
     """,
     "standard": """
-    /* standard.swift auto-generated from any */
+    // standard.swift auto-generated from any
 
     import Foundation
 
@@ -181,7 +181,7 @@ private let expectedStrings = [
 
     """,
     "extension": """
-    /* UIColor+test.swift auto-generated from any */
+    // UIColor+test.swift auto-generated from any
 
     import Foundation
 
