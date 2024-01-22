@@ -32,7 +32,7 @@ public class ConfigGenerator {
                 throw ConfigError.badJSON
             }
             guard let template = templates.first(where: { $0.canHandle(config: config) == true }) else { throw ConfigError.noTemplate }
-            let configurationFile = try template.init(config: config, name: url.deletingPathExtension().lastPathComponent, scheme: arguments.scheme, source: url.deletingLastPathComponent())
+            let configurationFile = try template.init(config: config, name: url.deletingPathExtension().lastPathComponent, scheme: arguments.scheme, source: url.deletingLastPathComponent(), generationBehaviour: GenerationBehaviour(developerMode: arguments.developerMode))
             var swiftOutput: URL
             if let filename = configurationFile.filename {
                 swiftOutput = url.deletingLastPathComponent().appendingPathComponent(filename)

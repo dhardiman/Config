@@ -54,9 +54,9 @@ struct Configuration {
     }
 
     // swiftlint:disable:next identifier_name IV is a well understood abbreviation
-    func stringRepresentation(scheme: String, iv: IV, encryptionKey: String?, requiresNonObjcDeclarations: Bool, publicProperties: Bool, instanceProperties: Bool, indentWidth: Int = 0) -> String {
+    func stringRepresentation(scheme: String, iv: IV, encryptionKey: String?, requiresNonObjcDeclarations: Bool, publicProperties: Bool, instanceProperties: Bool, indentWidth: Int = 0, generationBehaviour: GenerationBehaviour) -> String {
         let separator = "\n\n"
-        let propertiesString = properties.values.map({ $0.propertyDeclaration(for: keyForProperty($0, in: scheme), iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjcDeclarations, isPublic: publicProperties, instanceProperty: instanceProperties, indentWidth: indentWidth) })
+        let propertiesString = properties.values.map({ $0.propertyDeclaration(for: keyForProperty($0, in: scheme), iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjcDeclarations, isPublic: publicProperties, instanceProperty: instanceProperties, indentWidth: indentWidth, generationBehaviour: generationBehaviour) })
             .sorted()
             .joined(separator: separator)
 
@@ -67,7 +67,7 @@ struct Configuration {
             className = className.replacingCharacters(in: startIndex...startIndex, with: firstLetter.description.uppercased())
             return """
             \(String.indent(for: indentWidth))public enum \(className) {
-            \(config.value.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: publicProperties, instanceProperties: instanceProperties, indentWidth: indentWidth + 1))
+            \(config.value.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: publicProperties, instanceProperties: instanceProperties, indentWidth: indentWidth + 1, generationBehaviour: generationBehaviour))
             \(String.indent(for: indentWidth))}
             """
         }
@@ -186,8 +186,10 @@ struct ConfigurationFile: Template {
     let entityType: String?
 
     let outputAsInstanceVariables: Bool
+    
+    let generationBehaviour: GenerationBehaviour
 
-    init(config: [String: Any], name: String, scheme: String, source: URL) throws {
+    init(config: [String: Any], name: String, scheme: String, source: URL, generationBehaviour: GenerationBehaviour = GenerationBehaviour()) throws {
         self.scheme = scheme
         self.name = name
 
@@ -197,6 +199,8 @@ struct ConfigurationFile: Template {
 
         self.customTypes = CustomType.typeArray(from: self.template)
         self.commonPatterns = OverridePattern.patterns(from: self.template)
+        
+        self.generationBehaviour = generationBehaviour
 
         if let defaultType = template?["defaultType"] as? String {
             self.defaultType = PropertyType(rawValue: defaultType)
@@ -244,7 +248,7 @@ struct ConfigurationFile: Template {
     var description: String {
         let extendedClass = template?["extensionOn"] as? String
         let requiresNonObjcDeclarations = template?["requiresNonObjC"] as? Bool ?? false
-        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil, instanceProperties: outputAsInstanceVariables)
+        let values = rootConfiguration.stringRepresentation(scheme: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjcDeclarations: requiresNonObjcDeclarations, publicProperties: extendedClass == nil, instanceProperties: outputAsInstanceVariables, generationBehaviour: generationBehaviour)
 
         let entityType = extendedClass != nil ? "extension" : (self.entityType ?? "enum")
         let importsString = imports.sorted().map { "import \($0)" }.joined(separator: "\n")

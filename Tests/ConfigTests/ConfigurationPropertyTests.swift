@@ -22,10 +22,10 @@ class ConfigurationPropertyTests: XCTestCase {
         ])
     }
 
-    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, instanceProperty: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
+    func whenTheDeclarationIsWritten<T>(for configurationProperty: ConfigurationProperty<T>?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, instanceProperty: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0, generationBehaviour: GenerationBehaviour = GenerationBehaviour()) throws -> String? {
         let iv = try IV(dict: ["initialise": "me"])
         print("\(iv.hash)")
-        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth)
+        return configurationProperty?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth, generationBehaviour: generationBehaviour)
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {
@@ -352,6 +352,13 @@ class ConfigurationPropertyTests: XCTestCase {
         let property = ConfigurationProperty<String>(key: "test", typeHint: "EnvironmentVariable", dict: ["defaultValue": "SOMETHING"])
         let expectedValue = ##"    static let test: String = #"testValue"#"##
         let actualValue = try whenTheDeclarationIsWritten(for: property)
+        expect(actualValue).to(equal(expectedValue))
+    }
+    
+    func testItCreatesAWarningWhenAnEnvironmentVariablePropertyDoesNotExistAndDeveloperModeIsEnabled() throws {
+        let property = ConfigurationProperty<String>(key: "test", typeHint: "EnvironmentVariable", dict: ["defaultValue": "DOESNT_EXIST"])
+        let expectedValue = ##"    static let test: String = #"Environment variable DOESNT_EXIST was not defined at runtime"#"##
+        let actualValue = try whenTheDeclarationIsWritten(for: property, generationBehaviour: GenerationBehaviour(developerMode: true))
         expect(actualValue).to(equal(expectedValue))
     }
 

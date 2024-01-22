@@ -19,7 +19,7 @@ struct IV: Property {
         hash = try dict.hashRepresentation()
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int, generationBehaviour: GenerationBehaviour) -> String {
         return "\(String.indent(for: indentWidth))\(isPublic ? "public " : "")\(instanceProperty ? "" : "static ")let \(key): \(typeName) = \(byteArrayOutput(from: Array(hash.utf8)))"
     }
 }

@@ -39,7 +39,7 @@ struct ReferenceProperty: Property {
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int, generationBehaviour: GenerationBehaviour) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
