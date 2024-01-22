@@ -169,11 +169,6 @@ enum PropertyType: String {
         }
     }
     
-    private enum EnvResult {
-        case defined(String)
-        case undefined
-    }
-
     private func produceEnvironmentVariable(for value: String?, generationBehaviour: GenerationBehaviour) -> String {
         guard let environmentVariableName = value,
               let rawValue = getenv(environmentVariableName),
