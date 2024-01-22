@@ -348,12 +348,22 @@ class ConfigurationPropertyTests: XCTestCase {
     }
 
     func testItCanWriteAnEnvironmentVariableProperty() throws {
-        // Set an environment variable using the libc API
-        setenv("SOMETHING", "testValue", 1)
+        when(environmentVariableNamed: "SOMETHING", hasValue: "testValue")
         let property = ConfigurationProperty<String>(key: "test", typeHint: "EnvironmentVariable", dict: ["defaultValue": "SOMETHING"])
         let expectedValue = ##"    static let test: String = #"testValue"#"##
         let actualValue = try whenTheDeclarationIsWritten(for: property)
         expect(actualValue).to(equal(expectedValue))
+    }
+
+    func testItCanWriteAnEncryptedEnvironmentVariableProperty() throws {
+        // Note: this test doesn't test the encryption itself, that test will be written elsewhere
+        when(environmentVariableNamed: "SOMETHING_SECRET", hasValue: "secretValue")
+        let property = ConfigurationProperty<String>(key: "test",
+                                                     typeHint: "EncryptedEnvironmentVariable",
+                                                     dict: ["defaultValue": "SOMETHING_SECRET"])
+        let expectedValue = "    static let test: [UInt8] = ["
+        let actualValue = try whenTheDeclarationIsWritten(for: property, encryptionKey: "testKey")
+        expect(actualValue).to(beginWith(expectedValue))
     }
 
     func testItCanUseCommonPatternsForOverrides() throws {
@@ -367,5 +377,10 @@ class ConfigurationPropertyTests: XCTestCase {
         let expectedValue = ##"    static let test: String = #"pattern value"#"##
         let actualValue = try whenTheDeclarationIsWritten(for: property, scheme: "gary")
         expect(actualValue).to(equal(expectedValue))
+    }
+
+    private func when(environmentVariableNamed environmentVariableName: String, hasValue value: String) {
+        // Set an environment variable using the libc API
+        setenv(environmentVariableName, value, 1)
     }
 }

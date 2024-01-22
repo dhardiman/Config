@@ -71,10 +71,11 @@ enum PropertyType: String {
     case dynamicColour = "DynamicColour"
     case dynamicColourReference = "DynamicColourReference"
     case environmentVariable = "EnvironmentVariable"
+    case encryptedEnvironmentVariable = "EncryptedEnvironmentVariable"
 
     var typeName: String {
         switch self {
-        case .encrypted, .encryptionKey:
+        case .encrypted, .encryptionKey, .encryptedEnvironmentVariable:
             return "[UInt8]"
         case .dictionary:
             return "[String: Any]"
@@ -154,15 +155,26 @@ enum PropertyType: String {
         case .dynamicColourReference:
             return dynamicColourReferenceValue(for: value as? [String: String])
         case .environmentVariable:
-            guard let environmentVariable = value as? String,
-                  let rawValue = getenv(environmentVariable),
-                  let stringValue = String(utf8String: rawValue) else {
-                fatalError("Missing environment variable \(value)")
+            return "#\"\(environmentVariable(for: value as? String))\"#"
+        case .encryptedEnvironmentVariable:
+            let valueString = environmentVariable(for: value as? String)
+            guard let key = key else { fatalError("No encryption key present to encrypt value") }
+            guard let encryptedString = valueString.encrypt(key: Array(key.utf8), iv: Array(iv.hash.utf8)) else {
+                fatalError("Unable to encrypt \(value) with key")
             }
-            return "#\"\(stringValue)\"#"
+            return byteArrayOutput(from: encryptedString)
         default:
             return "\(value)"
         }
+    }
+
+    private func environmentVariable(for value: String?) -> String {
+        guard let environmentVariableName = value,
+              let rawValue = getenv(environmentVariableName),
+              let stringValue = String(utf8String: rawValue) else {
+            fatalError("Missing environment variable \(value ?? "")")
+        }
+        return stringValue
     }
 
     private func colourValue(for value: String?) -> String {
