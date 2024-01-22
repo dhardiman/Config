@@ -30,7 +30,15 @@ class ArgumentsTests: XCTestCase {
             "--configPath", "/config/path"
         ])
         expect(arguments.additionalExtension).to(beNil())
+    }
 
+    func testDevModeIsDisabledByDefault() throws {
+        let arguments = try Arguments(argumentList: [
+            "binary",
+            "--scheme", "test-scheme",
+            "--configPath", "/config/path"
+        ])
+        expect(arguments.developerMode).to(beFalse())
     }
 
     func testItThrowsAnExceptionWhenRequiredValuesAreNotPassed() {
