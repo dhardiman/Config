@@ -60,6 +60,8 @@ The "key" will be used as a static property name in a `class` so should have a f
 - `Regex`: A regular expression pattern. Will be converted to `try! NSRegularExpression(patthen: "the value", options: [])`
 - `EncryptionKey`: A key to use to encrypt sensitive info.
 - `Encrypted`: A value that should be encrypted using the provided key
+- `EnvironmentVariable`: A named environment variable, the value of which will be obtained from the current shell environment at runtime.
+- `EncryptedEnvironmentVariable`: Encrypted version of `EnvironmentVariable` (requires `EncryptionKey` be defined).
 - `Dictionary`: A dictionary. Keys should be strings, values in the dictionary should be either string, numeric, or a new dictionary.
 - `Reference`: See [Reference Properties](#reference-properties) below.
 - Enum types. Set the `type` to the name of the enum, set the value to be the case, preceded by a `.`, so `.thing`. If you need enums from a custom module, add a string array of imports to the template section.
