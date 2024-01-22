@@ -29,10 +29,12 @@ struct EnumConfiguration: Template {
     let type: String
 
     let properties: [String: Property]
+    let generationBehaviour: GenerationBehaviour
 
-    init(config: [String: Any], name: String, scheme: String, source: URL) throws {
+    init(config: [String: Any], name: String, scheme: String, source: URL, generationBehaviour: GenerationBehaviour = GenerationBehaviour()) throws {
         self.name = name
         self.scheme = scheme
+        self.generationBehaviour = generationBehaviour
         guard let template = config["template"] as? [String: String],
             let type = template["rawType"] else { throw EnumError.noType }
         self.type = type

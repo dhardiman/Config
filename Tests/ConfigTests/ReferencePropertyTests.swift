@@ -24,7 +24,7 @@ class ReferencePropertyTests: XCTestCase {
     func whenTheDeclarationIsWritten(for property: ReferenceProperty?, scheme: String = "any", encryptionKey: String? = nil, isPublic: Bool = false, instanceProperty: Bool = false, requiresNonObjC: Bool = false, indentWidth: Int = 0) throws -> String? {
         let iv = try IV(dict: ["initialise": "me"])
         print("\(iv.hash)")
-        return property?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth)
+        return property?.propertyDeclaration(for: scheme, iv: iv, encryptionKey: encryptionKey, requiresNonObjCDeclarations: requiresNonObjC, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth, generationBehaviour: GenerationBehaviour())
     }
 
     func testItCanWriteADeclarationForAStringPropertyUsingTheDefaultValue() throws {

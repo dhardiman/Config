@@ -16,7 +16,7 @@ protocol Property {
     var key: String { get }
     var typeName: String { get }
     var associatedProperty: String? { get }
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int, generationBehaviour: GenerationBehaviour) -> String
 }
 
 private func dictionaryValue(_ dict: [String: Any]) -> String {
@@ -110,7 +110,7 @@ enum PropertyType: String {
         }
     }
 
-    func valueDeclaration(for value: Any, iv: IV, key: String?) -> String {
+    func valueDeclaration(for value: Any, iv: IV, key: String?, generationBehaviour: GenerationBehaviour) -> String {
         let stringValueAllowingOptional = { (optional: Bool) -> String in
             if let string = value as? String {
                 return string.isEmpty ? "\"\"" : "#\"\(string)\"#"
@@ -155,24 +155,34 @@ enum PropertyType: String {
         case .dynamicColourReference:
             return dynamicColourReferenceValue(for: value as? [String: String])
         case .environmentVariable:
-            return "#\"\(environmentVariable(for: value as? String))\"#"
+            let valueString = produceEnvironmentVariable(for: value as? String, generationBehaviour: generationBehaviour)
+                return "#\"\(valueString)\"#"
         case .encryptedEnvironmentVariable:
-            let valueString = environmentVariable(for: value as? String)
             guard let key = key else { fatalError("No encryption key present to encrypt value") }
-            guard let encryptedString = valueString.encrypt(key: Array(key.utf8), iv: Array(iv.hash.utf8)) else {
-                fatalError("Unable to encrypt \(value) with key")
-            }
-            return byteArrayOutput(from: encryptedString)
+            let valueString = produceEnvironmentVariable(for: value as? String, generationBehaviour: generationBehaviour)
+                guard let encryptedString = valueString.encrypt(key: Array(key.utf8), iv: Array(iv.hash.utf8)) else {
+                    fatalError("Unable to encrypt \(value) with key")
+                }
+                return byteArrayOutput(from: encryptedString)
         default:
             return "\(value)"
         }
     }
+    
+    private enum EnvResult {
+        case defined(String)
+        case undefined
+    }
 
-    private func environmentVariable(for value: String?) -> String {
+    private func produceEnvironmentVariable(for value: String?, generationBehaviour: GenerationBehaviour) -> String {
         guard let environmentVariableName = value,
               let rawValue = getenv(environmentVariableName),
               let stringValue = String(utf8String: rawValue) else {
-            fatalError("Missing environment variable \(value ?? "")")
+            if generationBehaviour.developerMode {
+                return "Environment variable \(value ?? "") was not defined at runtime"
+            } else {
+                fatalError("Missing environment variable \(value ?? "")")
+            }
         }
         return stringValue
     }

@@ -92,7 +92,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         return defaultValue
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int, generationBehaviour: GenerationBehaviour) -> String {
         var template: String = ""
         if let description = description {
             template += "\(String.indent(for: indentWidth))/// \(description)\n"
@@ -107,7 +107,7 @@ struct ConfigurationProperty<T>: Property, AssociatedPropertyKeyProviding {
         let propertyValue = value(for: scheme)
         let outputValue: String
         if let type = type {
-            outputValue = type.valueDeclaration(for: propertyValue, iv: iv, key: encryptionKey)
+            outputValue = type.valueDeclaration(for: propertyValue, iv: iv, key: encryptionKey, generationBehaviour: generationBehaviour)
         } else {
             outputValue = "\(propertyValue)"
         }

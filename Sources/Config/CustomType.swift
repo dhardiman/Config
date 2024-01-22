@@ -55,7 +55,7 @@ struct CustomProperty: Property {
         return customType.typeName
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int, generationBehaviour: GenerationBehaviour) -> String {
         return template(for: description, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
             .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
@@ -94,7 +94,7 @@ struct CustomPropertyArray: Property {
         return "[\(customType.typeName)]"
     }
 
-    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int) -> String {
+    func propertyDeclaration(for scheme: String, iv: IV, encryptionKey: String?, requiresNonObjCDeclarations: Bool, isPublic: Bool, instanceProperty: Bool, indentWidth: Int, generationBehaviour: GenerationBehaviour) -> String {
         return template(for: description, isPublic: isPublic, instanceProperty: instanceProperty, indentWidth: indentWidth).replacingOccurrences(of: "{key}", with: key)
             .replacingOccurrences(of: "{typeName}", with: typeName)
             .replacingOccurrences(of: "{value}", with: outputValue(for: scheme, type: customType))
@@ -125,7 +125,7 @@ private func valueString(for placeholder: Placeholder, from dictionary: [String:
 private func valueString(for placeholder: Placeholder, from value: Any) -> String {
     guard let unusedIV = try? IV(dict: [:]) else { return "" }
     if let type = placeholder.type {
-        return type.valueDeclaration(for: value, iv: unusedIV, key: nil)
+        return type.valueDeclaration(for: value, iv: unusedIV, key: nil, generationBehaviour: GenerationBehaviour())
     } else {
         return "\(value)"
     }

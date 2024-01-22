@@ -33,7 +33,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             static let test: CustomType = CustomType(oneThing: firstValue, secondThing: secondValue)
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: false, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: false, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputAPublicPropertyDeclarationCorrectly() throws {
@@ -42,7 +42,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             public let test: CustomType = CustomType(oneThing: firstValue, secondThing: secondValue)
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: true, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: true, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputAPropertyDeclarationCorrectlyForAnOverriddenScheme() throws {
@@ -51,7 +51,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             public static let test: CustomType = CustomType(oneThing: firstOverriddenValue, secondThing: secondOverriddenValue)
         """
-        expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAPropertyForAnInitialiserWithoutPlaceholders() throws {
@@ -63,7 +63,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             public static let test: CustomType = CustomType()
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAPropertyForASinglePlaceholder() {
@@ -75,7 +75,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             public static let test: CustomType = CustomType(thingy: test default value)
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAPropertyForASingleNamedPlaceholder() {
@@ -87,7 +87,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             public static let test: CustomType = CustomType(thingy: #"firstValue"#)
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAPropertyForATypeWithTypeAnnotations() {
@@ -96,7 +96,7 @@ class CustomPropertyTests: XCTestCase {
             /// A description
             public static let test: CustomType = CustomType(oneThing: #"firstValue"#, secondThing: true)
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAStringWithEscapedSlashesCorrectly() {
@@ -104,7 +104,7 @@ class CustomPropertyTests: XCTestCase {
         let expectedValue = """
             public static let test: NSRegularExpression = try! NSRegularExpression(expression: #"^.*\\@.*\\.[a-zA-Z]{2,3}$"#, options: [])
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAStringWithEscapedSlashesCorrectlyForSingleValue() {
@@ -112,7 +112,7 @@ class CustomPropertyTests: XCTestCase {
         let expectedValue = """
             public static let test: NSRegularExpression = try! NSRegularExpression(expression: #"^.*\\@.*\\.[a-zA-Z]{2,3}$"#, options: [])
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 }
 
@@ -139,7 +139,7 @@ class CustomPropertyArrayTests: XCTestCase {
             /// A description
             public static let test: [CustomType] = [CustomType(oneThing: #"firstValue"#, secondThing: true)]
         """
-        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "any", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 
     func testItOutputsAPropertyForAnOverriddenScheme() {
@@ -148,7 +148,7 @@ class CustomPropertyArrayTests: XCTestCase {
             /// A description
             public static let test: [CustomType] = [CustomType(oneThing: #"firstOverriddenValue"#, secondThing: false)]
         """
-        expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0)).to(equal(expectedValue))
+        expect(property.propertyDeclaration(for: "override", iv: try IV(dict: [:]), encryptionKey: nil, requiresNonObjCDeclarations: false, isPublic: true, instanceProperty: false, indentWidth: 0, generationBehaviour: GenerationBehaviour())).to(equal(expectedValue))
     }
 }
 
