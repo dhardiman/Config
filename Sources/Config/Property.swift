@@ -157,7 +157,7 @@ enum PropertyType: String {
             guard let environmentVariable = value as? String,
                   let rawValue = getenv(environmentVariable),
                   let stringValue = String(utf8String: rawValue) else {
-                return "\"\""
+                fatalError("Missing environment variable \(value)")
             }
             return "#\"\(stringValue)\"#"
         default:
