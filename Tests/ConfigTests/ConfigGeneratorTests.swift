@@ -107,6 +107,7 @@ class ConfigGeneratorTests: XCTestCase {
         \(Arguments.Option.configPath.usage)
         \(Arguments.Option.additionalExtension.usage)
         \(Arguments.Option.verbose.usage)
+        \(Arguments.Option.developerMode.usage)
         """))
     }
 
